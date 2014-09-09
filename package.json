@@ -14,9 +14,12 @@
   ],
   "dependencies": {
     "shelljs": "^0.1.4",
-    "adm-zip": "0.4.4",
-    "open": "0.0.x"
+    "adm-zip": "0.4.4"
   },
+  "bundledDependencies": [
+    "shelljs",
+    "adm-zip"
+  ],
   "author": "Apache Software Foundation",
   "contributors": [
       {"name": "Steve Gill", "email": "steveng@adobe.com"},
