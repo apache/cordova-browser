@@ -1,5 +1,5 @@
 // Platform: browser
-// 3.5.1
+// 3.5.2
 /*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -19,7 +19,7 @@
  under the License.
 */
 ;(function() {
-var CORDOVA_JS_BUILD_LABEL = '3.5.1';
+var CORDOVA_JS_BUILD_LABEL = '3.5.2';
 // file: src/scripts/require.js
 
 /*jshint -W079 */

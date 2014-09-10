@@ -21,7 +21,6 @@
 
 var shell = require('shelljs'),
     spawn = require('child_process').spawn,
-    open = require('open'),
     project = 'file://' + shell.pwd() + '/platforms/browser/www/index.html';
 
 spawn('open', ['-a', 'Google\ Chrome', '--args', '--disable-web-security', project]);
