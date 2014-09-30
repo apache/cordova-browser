@@ -1,5 +1,5 @@
 // Platform: browser
-// 3.5.2
+// 8ca0f3b2b87e0759c5236b91c80f18438544409c
 /*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -19,7 +19,7 @@
  under the License.
 */
 ;(function() {
-var CORDOVA_JS_BUILD_LABEL = '3.5.2';
+var PLATFORM_VERSION_BUILD_LABEL = '3.7.0-dev';
 // file: src/scripts/require.js
 
 /*jshint -W079 */
@@ -175,7 +175,8 @@ function createEvent(type, data) {
 var cordova = {
     define:define,
     require:require,
-    version:CORDOVA_JS_BUILD_LABEL,
+    version:PLATFORM_VERSION_BUILD_LABEL,
+    platformVersion:PLATFORM_VERSION_BUILD_LABEL,
     platformId:platform.id,
     /**
      * Methods to add/remove your own addEventListener hijacking on document + window.
@@ -265,7 +266,7 @@ var cordova = {
         try {
             cordova.callbackFromNative(callbackId, true, args.status, [args.message], args.keepCallback);
         } catch (e) {
-            console.log("Error in error callback: " + callbackId + " = "+e);
+            console.log("Error in success callback: " + callbackId + " = "+e);
         }
     },
 
@@ -806,23 +807,27 @@ module.exports = channel;
 // file: src/browser/exec.js
 define("cordova/exec", function(require, exports, module) {
 
-//var browser = require('cordova/platform');
 var cordova = require('cordova');
 var execProxy = require('cordova/exec/proxy');
 
 module.exports = function(success, fail, service, action, args) {
-    var proxy = execProxy.get(service,action);
-    if(proxy) {
+
+    var proxy = execProxy.get(service, action);
+
+    if (proxy) {
         var callbackId = service + cordova.callbackId++;
-        //console.log("EXEC:" + service + " : " + action);
+
         if (typeof success == "function" || typeof fail == "function") {
             cordova.callbacks[callbackId] = {success:success, fail:fail};
         }
+
         try {
             proxy(success, fail, args);
         }
         catch(e) {
-            console.log("Exception calling native with command :: " + service + " :: " + action  + " ::exception=" + e);
+            // TODO throw maybe?
+            var msg = "Exception calling :: " + service + " :: " + action  + " ::exception=" + e;
+            console.log(msg);
         }
     }
     else {
@@ -862,22 +867,8 @@ module.exports = {
 };
 });
 
-// file: src/browser/browser/commandProxy.js
-define("cordova/browser/commandProxy", function(require, exports, module) {
-
-console.log('WARNING: please require cordova/exec/proxy instead');
-module.exports = require('cordova/exec/proxy');
-
-});
-
-// file: src/browser/init.js
+// file: src/common/init.js
 define("cordova/init", function(require, exports, module) {
-
-/*
- * This file has been copied into the browser platform and patched
- * to fix a problem with replacing the navigator object. We will have
- * to keep this file up-to-date with the common init.js.
- */
 
 var channel = require('cordova/channel');
 var cordova = require('cordova');
@@ -913,15 +904,18 @@ function replaceNavigator(origNavigator) {
     // Without it, APIs such as getGamepads() break.
     if (CordovaNavigator.bind) {
         for (var key in origNavigator) {
-            try {
-                if (typeof origNavigator[key] == 'function') {
-                    newNavigator[key] = origNavigator[key].bind(origNavigator);
-                }
-            } catch(e) {
-                // This try/catch was added for Firefox OS 1.0 and 1.1
-                // because it throws an security exception when trying
-                // to access a few properties of the navigator object.
-                // It has been fixed in 1.2.
+            if (typeof origNavigator[key] == 'function') {
+                newNavigator[key] = origNavigator[key].bind(origNavigator);
+            } else {
+                (function(k) {
+                        Object.defineProperty(newNavigator, k, {
+                            get: function() {
+                                return origNavigator[k];
+                            },
+                            configurable: true,
+                            enumerable: true
+                        });
+                    })(key);
             }
         }
     }
@@ -970,9 +964,13 @@ modulemapper.clobbers('cordova/exec', 'Cordova.exec');
 // Call the platform-specific initialization.
 platform.bootstrap && platform.bootstrap();
 
-pluginloader.load(function() {
-    channel.onPluginsReady.fire();
-});
+// Wrap in a setTimeout to support the use-case of having plugin JS appended to cordova.js.
+// The delay allows the attached modules to be defined before the plugin loader looks for them.
+setTimeout(function() {
+    pluginloader.load(function() {
+        channel.onPluginsReady.fire();
+    });
+}, 0);
 
 /**
  * Create all cordova objects once native side is ready.
@@ -1037,6 +1035,16 @@ function replaceNavigator(origNavigator) {
         for (var key in origNavigator) {
             if (typeof origNavigator[key] == 'function') {
                 newNavigator[key] = origNavigator[key].bind(origNavigator);
+            } else {
+                (function(k) {
+                        Object.defineProperty(newNavigator, k, {
+                            get: function() {
+                                return origNavigator[k];
+                            },
+                            configurable: true,
+                            enumerable: true
+                        });
+                    })(key);
             }
         }
     }
@@ -1208,11 +1216,29 @@ define("cordova/platform", function(require, exports, module) {
 
 module.exports = {
     id: 'browser',
-    cordovaVersion: '3.0.0',
+    cordovaVersion: '3.4.0',
 
     bootstrap: function() {
-        require('cordova/modulemapper').clobbers('cordova/exec/proxy', 'cordova.commandProxy');
-        require('cordova/channel').onNativeReady.fire();
+
+        var modulemapper = require('cordova/modulemapper');
+        var channel = require('cordova/channel');
+
+        modulemapper.clobbers('cordova/exec/proxy', 'cordova.commandProxy');
+
+        channel.onNativeReady.fire();
+
+        // FIXME is this the right place to clobber pause/resume? I am guessing not
+        // FIXME pause/resume should be deprecated IN CORDOVA for pagevisiblity api
+        document.addEventListener('webkitvisibilitychange', function() {
+            if (document.webkitHidden) {
+                channel.onPause.fire();
+            }
+            else {
+                channel.onResume.fire();
+            }
+        }, false);
+
+    // End of bootstrap
     }
 };
 
@@ -1301,11 +1327,11 @@ function handlePluginsObject(path, moduleList, finishPluginLoading) {
 function findCordovaPath() {
     var path = null;
     var scripts = document.getElementsByTagName('script');
-    var term = 'cordova.js';
+    var term = '/cordova.js';
     for (var n = scripts.length-1; n>-1; n--) {
         var src = scripts[n].src.replace(/\?.*$/, ''); // Strip any query param (CB-6007).
         if (src.indexOf(term) == (src.length - term.length)) {
-            path = src.substring(0, src.length - term.length);
+            path = src.substring(0, src.length - term.length) + '/';
             break;
         }
     }
