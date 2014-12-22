@@ -37,8 +37,8 @@ function start(argv) {
     var configFile = path.resolve(path.join(path.join(__dirname, '../'), 'config.xml')),
         configXML = fs.readFileSync(configFile, 'utf8'),
         sourceFile = /<content[\s\S]*?src\s*=\s*"(.*?)"/i.exec(configXML),
-        projectUrl = 'file://' + path.resolve(path.join(path.join(__dirname, '../'), 'www', sourceFile[1]));
-    
+        projectUrl = 'file://' + path.resolve(path.join(path.join(__dirname, '../'), 'www', sourceFile ? sourceFile[1] : 'index.html'));
+
     // Defaults to executing the chrome browser
     run.runBrowser(args.target || "chrome", projectUrl).done();
 }
