@@ -14,11 +14,13 @@
     ],
     "dependencies": {
         "shelljs": "^0.1.4",
-        "adm-zip": "0.4.4"
+        "adm-zip": "0.4.4",
+        "q": "1.0.1"
     },
     "bundledDependencies": [
         "shelljs",
-        "adm-zip"
+        "adm-zip",
+        "q"
     ],
     "author": "Apache Software Foundation",
     "contributors": [

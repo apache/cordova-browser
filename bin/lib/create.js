@@ -26,14 +26,11 @@ var fs = require('fs'),
     ROOT    = path.join(__dirname, '..', '..'),
     check_reqs = require('./check_reqs');
 
-
 exports.createProject = function(project_path,package_name,project_name){
     var VERSION = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf-8');
     
     // Set default values for path, package and name
     project_path = typeof project_path !== 'undefined' ? project_path : "CordovaExample";
-    package_name = typeof package_name !== 'undefined' ? package_name : 'org.apache.cordova.example';
-    project_name = typeof project_name !== 'undefined' ? project_name : 'CordovaExample';
 
     // Check if project already exists
     if (fs.existsSync(project_path)) {
@@ -47,10 +44,7 @@ exports.createProject = function(project_path,package_name,project_name){
         process.exit(2);
     }
 
-    console.log('Creating Browser project');
-    console.log('Project Path '+ path.relative(process.cwd(),project_path));
-    console.log('Package Name '+ package_name);
-    console.log('Project Name '+ project_name);
+    console.log('Creating Browser project. Path: ' + path.relative(process.cwd(),project_path));
 
     //copy template directory
     shjs.cp('-r', path.join(ROOT, 'bin', 'templates', 'project', 'www'), project_path);
