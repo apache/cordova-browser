@@ -16,13 +16,15 @@
         "shelljs": "^0.1.4",
         "adm-zip": "0.4.4",
         "q": "1.0.1",
-        "nopt": "~3"
+        "nopt": "~3",
+        "mime": "1.2.11"
     },
     "bundledDependencies": [
         "shelljs",
         "adm-zip",
         "q",
-        "nopt"
+        "nopt",
+        "mime"
     ],
     "author": "Apache Software Foundation",
     "contributors": [
