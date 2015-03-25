@@ -23,33 +23,46 @@ var shell = require('shelljs'),
     fs = require('fs'),
     path = require('path'),
     run = require('./lib/run'),
-    nopt  = require('nopt');
+    nopt  = require('nopt'),
+    url = require('url');
 
 var args = process.argv;
 
 start(args);
 
 function start(argv) {
-    var args  = nopt({'help': Boolean, 'target': String}, {'help': ['/?', '-h', 'help', '-help', '/help']}, argv);
+    var args  = nopt({'help': Boolean, 'target': String, 'port': Number}, {'help': ['/?', '-h', 'help', '-help', '/help']}, argv);
     if(args.help) {
         help();
     }
-    var configFile = path.resolve(path.join(path.join(__dirname, '../'), 'config.xml')),
-        configXML = fs.readFileSync(configFile, 'utf8'),
-        sourceFile = /<content[\s\S]*?src\s*=\s*"(.*?)"/i.exec(configXML),
-        projectUrl = 'file://' + path.resolve(path.join(path.join(__dirname, '../'), 'www', sourceFile ? sourceFile[1] : 'index.html'));
 
-    // Defaults to executing the chrome browser
-    run.runBrowser(args.target || "chrome", projectUrl).done();
+    // defaults
+    args.port = args.port || 8000;
+    args.target = args.target || "chrome";
+
+    var root = path.join(__dirname, '../'),
+        configFile = path.resolve(path.join(root, 'config.xml')),
+        configXML = fs.readFileSync(configFile, 'utf8'),
+        sourceFile = /<content[\s]+?src\s*=\s*"(.*?)"/i.exec(configXML),
+        rootPlatform = path.resolve(path.join(root, 'www'));
+
+    run.runHttpServer(rootPlatform, args.port).then(function (urlRoot) {
+      var projectUrl = url.resolve(urlRoot, sourceFile ? sourceFile[1] : 'index.html');
+
+      console.log('Static file server running @ ' + projectUrl + '\nCTRL + C to shut down');
+
+      return run.runBrowser(args.target, projectUrl);
+    }).done();
 }
 
 function help() {
-    console.log("\nUsage: run [ --target=<browser> ]");
-    console.log("    --target=<browser> : Launches the specified browser.");
+    console.log("\nUsage: run [ --target=<browser> ] [ --port=<number> ]");
+    console.log("    --target=<browser> : Launches the specified browser. Chrome is default.");
+    console.log("    --port=<number>    : Http server uses specified port numner.");
     console.log("Examples:");
     console.log("    run");
-    console.log("    run --target=ie");
-    console.log("    run --target=chrome");
+    console.log("    run -- --target=ie");
+    console.log("    run -- --target=chrome --port=8000");
     console.log("");
     process.exit(0);
 };
