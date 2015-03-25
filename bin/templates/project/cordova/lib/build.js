@@ -23,7 +23,7 @@ var path = require('path'),
     fs = require('fs'),
     clean = require('./clean'),
     shjs = require('shelljs'),
-    zip = require('adm-zip'),
+    archiver = require('archiver'),
     check_reqs = require('./check_reqs'),
     platformWwwDir          = path.join('platforms', 'browser', 'www'),
     platformBuildDir        = path.join('platforms', 'browser', 'build'),
@@ -46,15 +46,24 @@ exports.buildProject = function(){
     if (!fs.existsSync(platformBuildDir)) {
         fs.mkdirSync(platformBuildDir);
     }
+  
+    // setup output stream
+    var zipFile = fs.createWriteStream(packageFile);
+
+    // Add finalize handler
+    zipFile.on('close', function () {
+      console.log('Browser packaged app built in '+ packageFile);
+      process.exit(0);
+    });
+
+    var zip = archiver('zip');
+
+    zip.pipe(zipFile);
 
     // add the project to a zipfile
-    var zipFile = zip();
-    zipFile.addLocalFolder(platformWwwDir, '.');
-    zipFile.writeZip(packageFile);
+    zip.directory(platformWwwDir, '.');
+    zip.finalize();
 
-    console.log('Browser packaged app built in '+ packageFile);
-
-    process.exit(0);
 };
 
 module.exports.help = function() {
