@@ -1,6 +1,6 @@
 {
   "name": "cordova-browser",
-  "version": "3.7.0-dev",
+  "version": "4.0.0-dev",
   "description": "cordova-browser release",
   "main": "bin/create",
   "repository": {
