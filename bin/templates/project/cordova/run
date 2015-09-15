@@ -44,11 +44,19 @@ function start(argv) {
         configXML = fs.readFileSync(configFile, 'utf8'),
         sourceFile = /<content[\s]+?src\s*=\s*"(.*?)"/i.exec(configXML);
 
+    var server;
+
     serve.servePlatform('browser', {port: args.port, noServerInfo: true}).then(function (serverInfo) {
+        server = serverInfo.server;
         var projectUrl = url.resolve('http://localhost:' + serverInfo.port + '/', sourceFile ? sourceFile[1] : 'index.html');
         console.log('Static file server running @ ' + projectUrl + '\nCTRL + C to shut down');
         return serve.launchBrowser({target: args.target, url: projectUrl});
-    }).done();
+    }).catch(function (error) {
+        console.log(error.message || error.toString());
+        if (server) {
+            server.close();
+        }
+    });
 }
 
 function help() {
