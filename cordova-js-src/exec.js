@@ -105,7 +105,11 @@ module.exports = function (success, fail, service, action, args) {
             console.log("Exception calling native with command :: " + service + " :: " + action  + " ::exception=" + e);
         }
     } else {
+
         console.log("Error: exec proxy not found for :: " + service + " :: " + action);
-        fail && fail("Missing Command Error");
+        
+        if(typeof fail === "function" ) {
+            fail("Missing Command Error");
+        }
     }
 };
