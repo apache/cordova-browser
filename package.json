@@ -12,11 +12,20 @@
         "browser",
         "apache"
     ],
+    "scripts": {
+        "test": "npm run jshint && npm run test-unit",
+        "test-unit": "node node_modules/jasmine-node/lib/jasmine-node/cli.js --captureExceptions spec/unit",
+        "jshint": "node node_modules/jshint/bin/jshint bin && node node_modules/jshint/bin/jshint tests"
+    },
     "dependencies": {
         "adm-zip": "0.4.4",
         "cordova-serve": "^0.1.2",
         "nopt": "~3",
         "shelljs": "^0.1.4"
+    },
+    "devDependencies": {
+        "jasmine-node": "~1",
+        "jshint": "^2.6.0"
     },
     "bundledDependencies": [
         "adm-zip",
