@@ -19,6 +19,8 @@
 #
 -->
 
+[![Build Status](https://travis-ci.org/apache/cordova-browser.svg)](https://travis-ci.org/apache/cordova-browser)
+
 # Cordova Browser
 
 Target modern web browsers to build Cordova based applications. 
