@@ -17,7 +17,7 @@
        under the License.
 */
 
-var Q      = require('Q'),
+var Q      = require('q'),
     create = require('./create'),
     fs     = require('fs'),
     shell = require('shelljs');
@@ -41,13 +41,14 @@ module.exports.run = function (argv) {
         shellfatal(shell.rm, '-rf', projectPath);
         create.createProject(projectPath);
     });
-}
+};
 
 function shellfatal(shellFunc) {
     var slicedArgs = Array.prototype.slice.call(arguments, 1);
+    var returnVal = null;
     try {
         shell.config.fatal = true;
-        var returnVal = shellFunc.apply(shell, slicedArgs);
+        returnVal = shellFunc.apply(shell, slicedArgs);
     }   
     finally {
         shell.config.fatal = false;

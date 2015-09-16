@@ -76,4 +76,4 @@ exports.createProject = function(project_path,package_name,project_name){
     ].forEach(function(f) { 
          shjs.chmod(755, path.join(project_path, 'cordova', f));
     });
-}
+};

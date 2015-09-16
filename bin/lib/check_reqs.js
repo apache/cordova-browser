@@ -23,4 +23,4 @@ under the License.
 
 module.exports.run = function() {
     return true;
-}
+};
