@@ -8,3 +8,4 @@ node_modules/.bin/jasmine-node
 node_modules/.bin/jshint
 node_modules/jasmine-node/
 node_modules/jshint/
+node_modules/tmp/
