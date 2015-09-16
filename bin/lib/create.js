@@ -21,12 +21,14 @@
  
 var fs = require('fs'),
     shjs = require('shelljs'),
+    Q = require ('q'),
     args = process.argv,
     path = require('path'),
     ROOT    = path.join(__dirname, '..', '..'),
     check_reqs = require('./check_reqs');
 
-exports.createProject = function(project_path,package_name,project_name){
+module.exports.createProject = function(project_path,package_name,project_name){
+    
     var VERSION = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf-8');
     
     // Set default values for path, package and name
@@ -76,4 +78,6 @@ exports.createProject = function(project_path,package_name,project_name){
     ].forEach(function(f) { 
          shjs.chmod(755, path.join(project_path, 'cordova', f));
     });
+
+    return Q.resolve();
 };
