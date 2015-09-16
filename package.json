@@ -43,8 +43,8 @@
       "email": "steveng@adobe.com"
     },
     {
-      "name": "Suraj Pindoria",
-      "email": "spindori@adobe.com"
+        "name": "Suraj Pindoria",
+        "email": "spindori@adobe.com"
     }
   ],
   "license": "Apache-2.0"
