@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "adm-zip": "0.4.4",
-    "cordova-serve": "^0.1.2",
+    "cordova-serve": "^1.0.0",
     "nopt": "~3",
     "q": "^1.4.1",
     "shelljs": "^0.1.4"
