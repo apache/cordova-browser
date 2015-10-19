@@ -58,7 +58,6 @@ module.exports = function (success, fail, service, action, args) {
 
             // callbackOptions param represents additional optional parameters command could pass back, like keepCallback or
             // custom callbackId, for example {callbackId: id, keepCallback: true, status: cordova.callbackStatus.JSON_EXCEPTION }
-            // CB-5806 [Windows8] Add keepCallback support to proxy
             var onSuccess = function (result, callbackOptions) {
                 callbackOptions = callbackOptions || {};
                 var callbackStatus;
