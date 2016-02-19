@@ -1,5 +1,5 @@
 // Platform: browser
-// 6950f96eba7c2c0181bc76d98443446068e0ea1e
+// 1b111058631e118dc37da473e30b60214c211d76
 /*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -101,7 +101,9 @@ if (typeof module === "object" && typeof require === "function") {
 // file: src/cordova.js
 define("cordova", function(require, exports, module) {
 
-if(window.cordova){
+// Workaround for Windows 10 in hosted environment case
+// http://www.w3.org/html/wg/drafts/html/master/browsers.html#named-access-on-the-window-object
+if (window.cordova && !(window.cordova instanceof HTMLElement)) {
     throw new Error("cordova already defined");
 }
 
@@ -815,7 +817,7 @@ module.exports = channel;
 
 });
 
-// file: /Users/steveng/repo/cordova/cordova-browser/cordova-js-src/confighelper.js
+// file: f:/coho/cordova-browser/cordova-js-src/confighelper.js
 define("cordova/confighelper", function(require, exports, module) {
 
 var config;
@@ -870,7 +872,7 @@ function readConfig(success, error) {
     }
 
     try {
-        xhr.open("get", "config.xml", true);
+        xhr.open("get", "/config.xml", true);
         xhr.send();
     } catch(e) {
         fail('[Browser][cordova.js][readConfig] Could not XHR config.xml: ' + JSON.stringify(e));
@@ -895,13 +897,30 @@ exports.readConfig = readConfig;
 
 });
 
-// file: /Users/steveng/repo/cordova/cordova-browser/cordova-js-src/exec.js
+// file: f:/coho/cordova-browser/cordova-js-src/exec.js
 define("cordova/exec", function(require, exports, module) {
+
+/*jslint sloppy:true, plusplus:true*/
+/*global require, module, console */
 
 var cordova = require('cordova');
 var execProxy = require('cordova/exec/proxy');
 
-module.exports = function(success, fail, service, action, args) {
+/**
+ * Execute a cordova command.  It is up to the native side whether this action
+ * is synchronous or asynchronous.  The native side can return:
+ *      Synchronous: PluginResult object as a JSON string
+ *      Asynchronous: Empty string ""
+ * If async, the native side will cordova.callbackSuccess or cordova.callbackError,
+ * depending upon the result of the action.
+ *
+ * @param {Function} success    The success callback
+ * @param {Function} fail       The fail callback
+ * @param {String} service      The name of the service to use
+ * @param {String} action       Action to be run in cordova
+ * @param {String[]} [args]     Zero or more arguments to pass to the method
+ */
+module.exports = function (success, fail, service, action, args) {
 
     var proxy = execProxy.get(service, action);
 
@@ -1142,9 +1161,10 @@ var channel = require('cordova/channel');
 var cordova = require('cordova');
 var modulemapper = require('cordova/modulemapper');
 var platform = require('cordova/platform');
+var pluginloader = require('cordova/pluginloader');
 var utils = require('cordova/utils');
 
-var platformInitChannelsArray = [channel.onDOMContentLoaded, channel.onNativeReady];
+var platformInitChannelsArray = [channel.onDOMContentLoaded, channel.onNativeReady, channel.onPluginsReady];
 
 // setting exec
 cordova.exec = require('cordova/exec');
@@ -1228,6 +1248,14 @@ if (window._nativeReady) {
 
 // Call the platform-specific initialization.
 platform.bootstrap && platform.bootstrap();
+
+// Wrap in a setTimeout to support the use-case of having plugin JS appended to cordova.js.
+// The delay allows the attached modules to be defined before the plugin loader looks for them.
+setTimeout(function() {
+    pluginloader.load(function() {
+        channel.onPluginsReady.fire();
+    });
+}, 0);
 
 /**
  * Create all cordova objects once native side is ready.
@@ -1449,7 +1477,7 @@ exports.reset();
 
 });
 
-// file: /Users/steveng/repo/cordova/cordova-browser/cordova-js-src/platform.js
+// file: f:/coho/cordova-browser/cordova-js-src/platform.js
 define("cordova/platform", function(require, exports, module) {
 
 module.exports = {
@@ -1484,10 +1512,6 @@ module.exports = {
 
 // file: src/common/pluginloader.js
 define("cordova/pluginloader", function(require, exports, module) {
-
-/*
-    NOTE: this file is NOT used when we use the browserify workflow
-*/
 
 var modulemapper = require('cordova/modulemapper');
 var urlutil = require('cordova/urlutil');
@@ -1593,6 +1617,54 @@ exports.load = function(callback) {
         var moduleList = require("cordova/plugin_list");
         handlePluginsObject(pathPrefix, moduleList, callback);
     }, callback);
+};
+
+
+});
+
+// file: src/common/pluginloader_b.js
+define("cordova/pluginloader_b", function(require, exports, module) {
+
+var modulemapper = require('cordova/modulemapper');
+
+// Handler for the cordova_plugins.js content.
+// See plugman's plugin_loader.js for the details of this object.
+function handlePluginsObject(moduleList) {
+    // if moduleList is not defined or empty, we've nothing to do
+    if (!moduleList || !moduleList.length) {
+        return;
+    }
+
+    // Loop through all the modules and then through their clobbers and merges.
+    for (var i = 0, module; module = moduleList[i]; i++) {
+        if (module.clobbers && module.clobbers.length) {
+            for (var j = 0; j < module.clobbers.length; j++) {
+                modulemapper.clobbers(module.id, module.clobbers[j]);
+            }
+        }
+
+        if (module.merges && module.merges.length) {
+            for (var k = 0; k < module.merges.length; k++) {
+                modulemapper.merges(module.id, module.merges[k]);
+            }
+        }
+
+        // Finally, if runs is truthy we want to simply require() the module.
+        if (module.runs) {
+            modulemapper.runs(module.id);
+        }
+    }
+}
+
+// Loads all plugins' js-modules. Plugin loading is syncronous in browserified bundle
+// but the method accepts callback to be compatible with non-browserify flow.
+// onDeviceReady is blocked on onPluginsReady. onPluginsReady is fired when there are
+// no plugins to load, or they are all done.
+exports.load = function(callback) {
+    var moduleList = require("cordova/plugin_list");
+    handlePluginsObject(moduleList);
+
+    callback();
 };
 
 
