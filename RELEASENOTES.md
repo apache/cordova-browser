@@ -20,6 +20,15 @@
 -->
 ## Release Notes for Cordova Browser ##
 
+### 4.1.0 (Mar 04, 2016)
+* CB-10755 Updated checked in node_modules
+* CB-10650 Non-index content.src causes Splashscreen to be not displayed on browser
+* CB-9836 Add .gitattributes to prevent CRLF line endings in repos
+* CB-9669 Browser exec should have more failsafes 
+* Update to use new 'express' implementation of cordova-serve.
+* CB-9658 Improve 'cordova run browser' when browser not installed.
+* CB-9654 'cordova run browser' -> duplicate 'CTRL + C' messages.
+
 ### 4.0.0 (Aug 13, 2015)
 * updated version in version script
 * added .ratignore and added missing AL header to readme
