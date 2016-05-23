@@ -1,5 +1,5 @@
 // Platform: browser
-// c517ca811b4948b630e0b74dbae6c9637939da24
+// 2fd4bcb84048415922d13d80d35b8d1668e8e150
 /*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -817,7 +817,7 @@ module.exports = channel;
 
 });
 
-// file: e:/cordova/cordova-browser/cordova-js-src/confighelper.js
+// file: f:/coho/cordova-browser/cordova-js-src/confighelper.js
 define("cordova/confighelper", function(require, exports, module) {
 
 var config;
@@ -837,6 +837,14 @@ function Config(xhr) {
 
 function readConfig(success, error) {
     var xhr;
+    // https://issues.apache.org/jira/browse/CB-11274
+    var pathsToTry = [
+        '/config.xml',
+        '/.config.xml',
+        '/' + cordova.platformId + '/www/config.xml',          // serve
+        '/' + cordova.platformId + '/assets/www/config.xml'    // serve (Android)
+    ];
+    var triedPathIndex = 0;
 
     if(typeof config != 'undefined') {
         success(config);
@@ -856,7 +864,19 @@ function readConfig(success, error) {
                 config = new Config(xhr);
                 success(config);
             }
-            else {
+            else if (xhr.status === 404) {
+                triedPathIndex++;
+
+                // Trying next path
+                if (triedPathIndex < pathsToTry.length) {
+                    try {
+                        xhr.open("get", pathsToTry[triedPathIndex], true);
+                        xhr.send();
+                    } catch(e) {
+                        fail('[Browser][cordova.js][xhrStatusChangeHandler] Could not XHR config.xml: ' + JSON.stringify(e));
+                    }
+                }
+            } else {
                 fail('[Browser][cordova.js][xhrStatusChangeHandler] Could not XHR config.xml: ' + xhr.statusText);
             }
         }
@@ -872,7 +892,7 @@ function readConfig(success, error) {
     }
 
     try {
-        xhr.open("get", "/config.xml", true);
+        xhr.open("get", pathsToTry[triedPathIndex], true);
         xhr.send();
     } catch(e) {
         fail('[Browser][cordova.js][readConfig] Could not XHR config.xml: ' + JSON.stringify(e));
@@ -897,7 +917,7 @@ exports.readConfig = readConfig;
 
 });
 
-// file: e:/cordova/cordova-browser/cordova-js-src/exec.js
+// file: f:/coho/cordova-browser/cordova-js-src/exec.js
 define("cordova/exec", function(require, exports, module) {
 
 /*jslint sloppy:true, plusplus:true*/
@@ -1477,7 +1497,7 @@ exports.reset();
 
 });
 
-// file: e:/cordova/cordova-browser/cordova-js-src/platform.js
+// file: f:/coho/cordova-browser/cordova-js-src/platform.js
 define("cordova/platform", function(require, exports, module) {
 
 module.exports = {
