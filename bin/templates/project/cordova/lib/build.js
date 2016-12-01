@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -18,48 +20,51 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
-var path    = require('path'),
-    fs      = require('fs'),
-    shjs    = require('shelljs'),
-    zip     = require('adm-zip'),
-    Q       = require('q'),
-    clean   = require('./clean'),
-    check_reqs = require('./check_reqs'),
-    platformWwwDir          = path.join('platforms', 'browser', 'www'),
-    platformBuildDir        = path.join('platforms', 'browser', 'build'),
-    packageFile             = path.join(platformBuildDir, 'package.zip');
+// jshint -W119
+// jshint -W104
+const path = require('path');
+const fs = require('fs');
+const archiver = require('archiver');
+const q = require('q');
+const clean = require('./clean');
+const check_reqs = require('./check_reqs');
+
+const platformWwwDir = path.join('platforms', 'browser', 'www');
+const platformBuildDir = path.join('platforms', 'browser', 'build');
+const packageFile = path.join(platformBuildDir, 'package.zip');
 
 /**
- * run
- *   Creates a zip file int platform/build folder
+ * Creates a zip file in platform/build folder
  */
 module.exports.run = function(){
-
-    return check_reqs.run()
-    .then(function(){
-            return clean.cleanProject();
-        },
-        function checkReqsError(err){
-            console.error('Please make sure you meet the software requirements in order to build a browser cordova project');
-    })
-    .then(function(){
-
+    return check_reqs.run().then(
+        ()      => { return clean.cleanProject(); },
+        (err)   => {
+            console.error('Software requirements: failure');
+            console.error(err);
+    }).then(function(){
         if (!fs.existsSync(platformBuildDir)) {
             fs.mkdirSync(platformBuildDir);
         }
 
-        // add the project to a zipfile
-        var zipFile = zip();
-        zipFile.addLocalFolder(platformWwwDir, '.');
-        zipFile.writeZip(packageFile);
+        let output = fs.createWriteStream(packageFile);
+        let archive = archiver('zip');
 
-        return Q.resolve();
+        output.on('close', () => {
+            let size = Math.floor(archive.pointer() / 1000);
+            console.log(`Built ${packageFile} (${size}KB)`);
+        });
 
+        archive.on('error', err => { throw err; });
+        archive.pipe(output);
+        archive.directory(platformWwwDir, '');
+        archive.finalize();
+
+        return q.resolve();
     });
 };
 
 module.exports.help = function() {
-    console.log('Usage: cordova build browser');
-    console.log('Build will create the packaged app in \''+platformBuildDir+'\'.');
+    console.log(`Usage: cordova build browser`);
+    console.log(`Build will create the packaged app in ${platformBuildDir}`);
 };
