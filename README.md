@@ -19,8 +19,8 @@
 #
 -->
 
-[![Build status](https://ci.appveyor.com/api/projects/status/19h1fq0lyvwtei05/branch/master)](https://ci.appveyor.com/project/Humbedooh/cordova-windows/branch/master)
-[![Build Status](https://travis-ci.org/apache/cordova-windows.svg?branch=master)](https://travis-ci.org/apache/cordova-windows)
+[![Build status](https://travis-ci.org/apache/cordova-browser.svg?branch=master )](https://travis-ci.org/apache/cordova-browser.svg?branch=master )
+[![Build Status](https://ci.appveyor.com/api/projects/status/4oan2jjn7nlgfay3/branch/master?svg=true)](https://ci.appveyor.com/api/projects/status/4oan2jjn7nlgfay3/branch/master?svg=true)
 
 # Cordova Browser
 
