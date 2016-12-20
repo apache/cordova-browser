@@ -7,10 +7,8 @@ node_js:
   - "6"
 install:
   - npm install
-  - npm install -g codecov
 script:
   - node --version
   - npm --version
   - npm test
-after_script:
-  - codecov
+
