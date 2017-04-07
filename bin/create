@@ -29,7 +29,7 @@ if(args.length < 3 || (args[2] == '--help' || args[2] == '/?' || args[2] == '-h'
     console.log('    <path_to_new_project>: Path to your new Cordova Browser project');
     console.log('    <package_name>: Package name, following reverse-domain style convention');
     console.log('    <project_name>: Project name');
-    process.exit(1);
+    process.exitCode = 1;
 } else {
-    create.createProject(args[2], args[3], args[4], args[5]).done();
+    create.createProject(args[2], args[3], args[4], args[5]);
 }
