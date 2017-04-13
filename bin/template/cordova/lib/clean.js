@@ -27,14 +27,12 @@ var fs = require('fs'),
 
 var run = function(){
 
-    console.log("cleaning ... ");
+    // TODO: everything calls check_reqs ... why?
     // Check that requirements are (still) met
     if (!check_reqs.run()) {
         console.error('Please make sure you meet the software requirements in order to clean an browser cordova project');
         process.exit(2);
     }
-
-    console.log('Cleaning Browser project');
 
     try {
         if (fs.existsSync(platformBuildDir)) {
@@ -51,5 +49,4 @@ module.exports.run = run;
 module.exports.cleanProject = function(){
     console.log("lib/clean will soon only export a `run` command, please update to not call `cleanProject`.");
     return run();
-}
-
+};

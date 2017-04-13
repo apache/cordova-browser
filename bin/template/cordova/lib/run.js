@@ -45,7 +45,7 @@ module.exports.run = function(args) {
 
     server.servePlatform('browser', {port: args.port, noServerInfo: true})
     .then(function () {
-        if(startPage == null) {
+        if(!startPage) {
             startPage = 'index.html';
         }
         else {

@@ -49,16 +49,21 @@ function Api(platform, platformRootDir, events) {
 
 Api.createPlatform = function (dest, config, options, events) {
 
-    console.log("browser createPlatform !! dest:" + dest);
+    //console.log("browser createPlatform !! dest:" + dest);
 
     events = setupEvents(events);
-    var name = config.name();
+    var name = "HelloCordova";
+    var id = "io.cordova.hellocordova";
+    if(config) {
+        name = config.name();
+        id = config.packageName();
+    }
     var result;
     try {
 
         var creator = require('../../lib/create');
-        console.log("creator = " + creator);
-        result = creator.createProject(dest, config.packageName(), name, options)
+        // console.log("creator = " + creator);
+        result = creator.createProject(dest, id, name, options)
         .then(function () {
             // after platform is created we return Api instance based on new Api.js location
             // This is required to correctly resolve paths in the future api calls
