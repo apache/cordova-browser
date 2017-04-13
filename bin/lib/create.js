@@ -36,28 +36,11 @@ module.exports.createProject = function(project_path,package_name,project_name){
     // create the dest and the standard place for our api to live
     // platforms/platformName/cordova/Api.js
 
-    var apiSrcPath = __dirname; // default value
-    console.log("apiSrcPath " + apiSrcPath);
-    // does options contain the info we desire?
-
-    var projectName = config ? config.name() : "HelloCordova";
-
-    events.emit('log', 'Creating Cordova project for cordova-platform-test:');
+    // TODO: other platforms emit log info
+    events.emit('log', 'Creating Cordova project for cordova-browser:');
     events.emit('log', '\tPath: ' + dest);
     events.emit('log', '\tName: ' + projectName);
 
-    shell.mkdir(dest);
-
-    // move a copy of our api to the new project
-    shell.cp('-r',apiSrcPath, dest);
-
-    // move our node_modules
-    var srcModulePath = path.join(__dirname,'../../../node_modules');
-    console.log("srcModulePath = " + srcModulePath);
-    shell.cp('-r',srcModulePath,path.join(dest,'cordova'));
-
-    // I promise I will return
-    return Promise.resolve(new Api(PLATFORM_NAME,dest,events));
 */
 
     var VERSION = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf-8');
@@ -102,6 +85,5 @@ module.exports.createProject = function(project_path,package_name,project_name){
 
     //copy cordova directory
     shell.cp('-r', path.join(ROOT, 'bin/template/cordova'), project_path);
-
     return Promise.resolve();
 };
