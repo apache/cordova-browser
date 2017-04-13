@@ -17,7 +17,11 @@
  under the License.
  */
 
-var Api = require("../bin/template/cordova/Api");
+var Api = require('../bin/template/cordova/Api');
+var shell = require('shelljs');
+var fs = require('fs');
+var path = require('path');
+var tmpDir = path.join(__dirname, './temp');
 
 describe('can get the Api', function() {
 
@@ -30,16 +34,17 @@ describe('can get the Api', function() {
         expect(typeof Api.createPlatform).toBe('function');
 
 // TODO: make this do something real
-        var promise = Api.createPlatform("../tmp");
+        var promise = Api.createPlatform(tmpDir);
         expect(promise).toBeDefined();
         expect(promise.then).toBeDefined();
         promise.then(function(res) {
             console.log('result = ' + res);
-            console.log("spec-success");
+            shell.rm('-rf', tmpDir);
             done();
         },
         function(err) {
             console.log("spec-error " + err);
+            shell.rm('-rf', tmpDir);
             done();
         });
     });

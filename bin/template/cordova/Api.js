@@ -121,11 +121,11 @@ Api.prototype.build = function (buildOptions) {
 };
 
 Api.prototype.run = function(runOptions) {
-
+    return require('./lib/run').run(runOptions);
 };
 
 Api.prototype.clean = function(cleanOptions) {
-    return require('./lib/clean').run();
+    return require('./lib/clean').run(cleanOptions);
 };
 
 Api.prototype.requirements = function() {
