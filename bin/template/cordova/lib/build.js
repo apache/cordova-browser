@@ -18,12 +18,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 var path    = require('path'),
     fs      = require('fs'),
     shjs    = require('shelljs'),
     zip     = require('adm-zip'),
-    Q       = require('q'),
     clean   = require('./clean'),
     check_reqs = require('./check_reqs'),
     platformWwwDir          = path.join('platforms', 'browser', 'www'),
@@ -38,7 +37,7 @@ module.exports.run = function(){
 
     return check_reqs.run()
     .then(function(){
-            return clean.cleanProject();
+            return clean.run();
         },
         function checkReqsError(err){
             console.error('Please make sure you meet the software requirements in order to build a browser cordova project');
@@ -54,7 +53,7 @@ module.exports.run = function(){
         zipFile.addLocalFolder(platformWwwDir, '.');
         zipFile.writeZip(packageFile);
 
-        return Q.resolve();
+        return Promise.resolve();
 
     });
 };

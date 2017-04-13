@@ -18,66 +18,90 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 var fs = require('fs'),
-    shjs = require('shelljs'),
-    Q = require ('q'),
+    shell = require('shelljs'),
     args = process.argv,
     path = require('path'),
     ROOT    = path.join(__dirname, '..', '..'),
     check_reqs = require('./check_reqs');
 
 module.exports.createProject = function(project_path,package_name,project_name){
-    
+
+    console.log("ROOT = " + ROOT);
+    console.log("browser :: createProject",project_path,package_name,project_name);
+
+
+/*
+    // create the dest and the standard place for our api to live
+    // platforms/platformName/cordova/Api.js
+
+    var apiSrcPath = __dirname; // default value
+    console.log("apiSrcPath " + apiSrcPath);
+    // does options contain the info we desire?
+
+    var projectName = config ? config.name() : "HelloCordova";
+
+    events.emit('log', 'Creating Cordova project for cordova-platform-test:');
+    events.emit('log', '\tPath: ' + dest);
+    events.emit('log', '\tName: ' + projectName);
+
+    shell.mkdir(dest);
+
+    // move a copy of our api to the new project
+    shell.cp('-r',apiSrcPath, dest);
+
+    // move our node_modules
+    var srcModulePath = path.join(__dirname,'../../../node_modules');
+    console.log("srcModulePath = " + srcModulePath);
+    shell.cp('-r',srcModulePath,path.join(dest,'cordova'));
+
+    // I promise I will return
+    return Promise.resolve(new Api(PLATFORM_NAME,dest,events));
+*/
+
     var VERSION = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf-8');
-    
+
     // Set default values for path, package and name
-    project_path = typeof project_path !== 'undefined' ? project_path : "CordovaExample";
+    project_path = project_path || "CordovaExample";
 
     // Check if project already exists
     if (fs.existsSync(project_path)) {
         console.error('Project already exists! Delete and recreate');
-        process.exit(2);
+        process.exitCode = 2;
+        return;
     }
-    
+
     // Check that requirements are met and proper targets are installed
     if (!check_reqs.run()) {
+        // TODO: use events.emit
         console.error('Please make sure you meet the software requirements in order to build a browser cordova project');
-        process.exit(2);
+        process.exitCode = 2;
+        return;
     }
 
-    console.log('Creating Browser project. Path: ' + path.relative(process.cwd(),project_path));
-
-    //copy template directory
-    shjs.cp('-r', path.join(ROOT, 'bin', 'templates', 'project', 'www'), project_path);
+    //copy template directory ( recursive )
+    //shell.cp('-r', path.join(ROOT, 'bin/templates/project/www'), project_path);
 
     //create cordova/lib if it does not exist yet
-    if (!fs.existsSync(path.join(project_path,'cordova', 'lib'))) {
-        shjs.mkdir('-p', path.join(project_path,'cordova', 'lib'));
+    if (!fs.existsSync(path.join(project_path,'cordova/lib'))) {
+        shell.mkdir('-p', path.join(project_path,'cordova/lib'));
     }
 
     //copy required node_modules
-    shjs.cp('-r', path.join(ROOT, 'node_modules'), path.join(project_path,'cordova'));
+    shell.cp('-r', path.join(ROOT, 'node_modules'), path.join(project_path,'cordova'));
 
     //copy check_reqs file
-    shjs.cp( path.join(ROOT, 'bin', 'lib', 'check_reqs.js'), path.join(project_path,'cordova', 'lib'));
-    
+    shell.cp( path.join(ROOT, 'bin/lib/check_reqs.js'), path.join(project_path,'cordova/lib'));
+
     //copy cordova js file
-    shjs.cp('-r', path.join(ROOT, 'cordova-lib', 'cordova.js'), path.join(project_path,'www'));
+    shell.cp('-r', path.join(ROOT, 'cordova-lib', 'cordova.js'), path.join(project_path,'www'));
 
     //copy cordova-js-src directory
-    shjs.cp('-rf', path.join(ROOT, 'cordova-js-src'), path.join(project_path, 'platform_www'));
+    shell.cp('-rf', path.join(ROOT, 'cordova-js-src'), path.join(project_path, 'platform_www'));
 
     //copy cordova directory
-    shjs.cp('-r', path.join(ROOT, 'bin', 'templates', 'project', 'cordova'), project_path); 
-    [
-        'run',
-        'build',
-        'clean',
-        'version',
-    ].forEach(function(f) { 
-         shjs.chmod(755, path.join(project_path, 'cordova', f));
-    });
+    shell.cp('-r', path.join(ROOT, 'bin/template/cordova'), project_path);
 
-    return Q.resolve();
+    return Promise.resolve();
 };

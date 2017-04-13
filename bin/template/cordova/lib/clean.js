@@ -18,29 +18,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
+
 var fs = require('fs'),
-    shjs = require('shelljs'),
+    shell = require('shelljs'),
     path = require('path'),
     check_reqs = require('./check_reqs'),
     platformBuildDir = path.join('platforms', 'browser', 'build');
 
-exports.cleanProject = function(){
+var run = function(){
 
-    // Check that requirements are (stil) met
+    console.log("cleaning ... ");
+    // Check that requirements are (still) met
     if (!check_reqs.run()) {
         console.error('Please make sure you meet the software requirements in order to clean an browser cordova project');
         process.exit(2);
     }
-    
+
     console.log('Cleaning Browser project');
+
     try {
         if (fs.existsSync(platformBuildDir)) {
-            shjs.rm('-r', platformBuildDir);
+            shell.rm('-r', platformBuildDir);
         }
     }
     catch(err) {
         console.log('could not remove '+platformBuildDir+' : '+err.message);
     }
 };
+
+module.exports.run = run;
+// just on the off chance something is still calling cleanProject, we will leave this here for a while
+module.exports.cleanProject = function(){
+    console.log("lib/clean will soon only export a `run` command, please update to not call `cleanProject`.");
+    return run();
+}
 

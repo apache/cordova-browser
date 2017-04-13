@@ -2,7 +2,8 @@
   "name": "cordova-browser",
   "version": "4.2.0-dev",
   "description": "cordova-browser release",
-  "main": "bin/create",
+  "main": "bin/template/cordova/Api.js",
+  "bin": "bin/create",
   "repository": {
     "type": "git",
     "url": "https://git-wip-us.apache.org/repos/asf/cordova-browser.git"
