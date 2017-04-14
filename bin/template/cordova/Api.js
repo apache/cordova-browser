@@ -89,9 +89,8 @@ Api.updatePlatform = function (dest, options, events) {
 };
 
 Api.prototype.getPlatformInfo = function () {
-    console.log("browser-platform:Api:getPlatformInfo");
+    // console.log("browser-platform:Api:getPlatformInfo");
     // return PlatformInfo object
-
     return {
         "locations":this.locations,
         "root": this.root,
@@ -102,22 +101,21 @@ Api.prototype.getPlatformInfo = function () {
 };
 
 Api.prototype.prepare = function (cordovaProject) {
-    console.log("browser-platform:Api:prepare");
+    //console.log("browser-platform:Api:prepare");
     return Promise.resolve();
 };
 
 Api.prototype.addPlugin = function (plugin, installOptions) {
-    console.log("browser-platform:Api:addPlugin");
+    //console.log("browser-platform:Api:addPlugin");
     return Promise.resolve();
 };
 
 Api.prototype.removePlugin = function (plugin, uninstallOptions) {
-    console.log("browser-platform:Api:removePlugin");
+    //console.log("browser-platform:Api:removePlugin");
     return Promise.resolve();
 };
 
 Api.prototype.build = function (buildOptions) {
-    console.log("API building this shit");
     var self = this;
     return require('./lib/check_reqs').run()
     .then(function () {
