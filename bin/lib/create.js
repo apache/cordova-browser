@@ -63,9 +63,6 @@ module.exports.createProject = function(project_path,package_name,project_name){
         return;
     }
 
-    //copy template directory ( recursive )
-    //shell.cp('-r', path.join(ROOT, 'bin/templates/project/www'), project_path);
-
     //create cordova/lib if it does not exist yet
     if (!fs.existsSync(path.join(project_path,'cordova/lib'))) {
         shell.mkdir('-p', path.join(project_path,'cordova/lib'));
@@ -78,10 +75,14 @@ module.exports.createProject = function(project_path,package_name,project_name){
     shell.cp( path.join(ROOT, 'bin/lib/check_reqs.js'), path.join(project_path,'cordova/lib'));
 
     //copy cordova js file
-    shell.cp('-r', path.join(ROOT, 'cordova-lib', 'cordova.js'), path.join(project_path,'www'));
+    shell.cp('-r', path.join(ROOT, 'cordova-lib', 'cordova.js'),
+                   path.join(project_path,'www'));
+    //copy template directory ( recursive )
+    shell.cp('-r', path.join(ROOT, 'bin/template/www'),  project_path);
 
     //copy cordova-js-src directory
-    shell.cp('-rf', path.join(ROOT, 'cordova-js-src'), path.join(project_path, 'platform_www'));
+    shell.cp('-rf', path.join(ROOT, 'cordova-js-src'),
+                    path.join(project_path, 'platform_www'));
 
     //copy cordova directory
     shell.cp('-r', path.join(ROOT, 'bin/template/cordova'), project_path);
