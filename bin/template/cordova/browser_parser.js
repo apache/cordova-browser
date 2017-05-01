@@ -66,19 +66,29 @@ browser_parser.prototype.cordovajs_src_path = function(libDir) {
 // Replace the www dir with contents of platform_www and app www.
 browser_parser.prototype.update_www = function() {
     // console.log("updating www");
-    return;
 
     var projectRoot = this.path;//util.isCordova(this.path);
-    var app_www = projectRoot;//util.projectWww(projectRoot);
+    var app_www = path.join(this.path,"../../www");
     var platform_www = path.join(this.path, 'platform_www');
+
+    var my_www = this.www_dir();
+    console.log("my_www = " + my_www);
+    console.log("projectRoot = " + projectRoot);
+    console.log("app_www = " + app_www);
+
 
     // Clear the www dir
     shell.rm('-rf', this.www_dir());
     shell.mkdir(this.www_dir());
+
     // Copy over all app www assets
-    shell.cp('-rf', path.join(app_www, '*'), this.www_dir());
+    var srcPath = path.join(app_www,'*');
+    console.log('srcPath = ' + srcPath);
+    var ls = shell.ls(srcPath);
+    console.log('ls ' + ls);
+    shell.cp('-Rf', srcPath, this.www_dir());
     // Copy over stock platform www assets (cordova.js)
-    shell.cp('-rf', path.join(platform_www, '*'), this.www_dir());
+    //shell.cp('-rf', path.join(platform_www, '*'), this.www_dir());
 };
 
 browser_parser.prototype.update_overrides = function() {
