@@ -268,8 +268,6 @@ Api.prototype.removePlugin = function (plugin, uninstallOptions) {
         // TODO: this should be done by plugin files uninstaller
         shell.rm('-rf', path.resolve(self.root, 'Plugins', plugin.id));
     });
-
-    return Promise.resolve();
 };
 
 Api.prototype._getInstaller = function(type) {
@@ -278,7 +276,7 @@ Api.prototype._getInstaller = function(type) {
         var installer = self._handler[type];
 
         if(!installer) {
-            console.log("unrecognized type " + type)
+            console.log("unrecognized type " + type);
             return;
         }
         else {
