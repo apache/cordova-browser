@@ -9,19 +9,16 @@ var shell = require('shelljs');
 var path = require('path');
 var fs = require('fs');
 
-var CordovaLogger = require('cordova-common').CordovaLogger;
-var ConfigParser = require('cordova-common').ConfigParser;
-var ActionStack = require('cordova-common').ActionStack;
-var PluginInfo = require('cordova-common').PluginInfo;
-var selfEvents = require('cordova-common').events;
-var xmlHelpers = require('cordova-common').xmlHelpers;
-
-
-
-var PlatformJson = require('cordova-common').PlatformJson;
-
-var PlatformMunger = require('cordova-common').ConfigChanges.PlatformMunger;
-var PluginInfoProvider = require('cordova-common').PluginInfoProvider;
+var cdvcmn = require('cordova-common');
+var CordovaLogger = cdvcmn.CordovaLogger;
+var ConfigParser = cdvcmn.ConfigParser;
+var ActionStack = cdvcmn.ActionStack;
+var PluginInfo = cdvcmn.PluginInfo;
+var selfEvents = cdvcmn.events;
+var xmlHelpers = cdvcmn.xmlHelpers;
+var PlatformJson = cdvcmn.PlatformJson;
+var PlatformMunger = cdvcmn.ConfigChanges.PlatformMunger;
+var PluginInfoProvider = cdvcmn.PluginInfoProvider;
 
 var BrowserParser = require('./browser_parser');
 var PLATFORM_NAME = 'browser';
@@ -169,8 +166,6 @@ Api.prototype.prepare = function (cordovaProject,options) {
 Api.prototype.addPlugin = function (pluginInfo, installOptions) {
 
     // console.log(new Error().stack);
-
-
     if (!pluginInfo) {
         return Promise.reject('The parameter is incorrect. The first parameter ' +
             'should be valid PluginInfo instance');
@@ -293,11 +288,6 @@ Api.prototype._getInstaller = function(type) {
             else {
                 installer.install(item, plugin_dir, self.root, plugin_id, options, project);
             }
-
-// var installerArgs = type === 'asset' ? [wwwDest] :
-//     type === 'js-module' ? [plugin_id, wwwDest]:
-//     [self.root, plugin_id, options, project];
-// installer.install.apply(null, [item, plugin_dir].concat(installerArgs));
         }
     };
 };

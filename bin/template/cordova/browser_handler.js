@@ -21,8 +21,6 @@
 var path = require('path');
 var fs = require('fs');
 var shell = require('shelljs');
-
-
 var events = require('cordova-common').events;
 
 module.exports = {
@@ -30,9 +28,21 @@ module.exports = {
         return path.join(project_dir, 'www');
     },
     package_name:function(project_dir) {
+        // this method should the id from root config.xml => <widget id=xxx
         //return common.package_name(project_dir, this.www_dir(project_dir));
-        console.log('package_name called with ' + project_dir);
-        return 'bob';
+        // console.log('package_name called with ' + project_dir);
+        var pkgName = "io.cordova.hellocordova";
+        var widget_id_regex = /(?:<widget\s+id=['"])(\S+)(?:['"])/;
+
+        var configPath = path.join(project_dir,'config.xml');
+        if(fs.existsSync(configPath)) {
+            var configStr = fs.readFileSync(configPath,'utf8');
+            var res = configStr.match(widget_id_regex);
+            if(res && res.length > 1) {
+                pkgName = res[1];
+            }
+        }
+        return pkgName;
     },
     'js-module': {
         install: function (jsModule, plugin_dir, plugin_id, www_dir) {
