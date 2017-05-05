@@ -3,9 +3,8 @@ temp
 .DS_Store
 .gitcore
 *.jar
-
+.vscode
 node_modules/
-
 
 !node_modules/adm-zip
 !node_modules/cordova-serve
