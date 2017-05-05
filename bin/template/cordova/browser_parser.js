@@ -76,31 +76,29 @@ browser_parser.prototype.update_www = function() {
     console.log("projectRoot = " + projectRoot);
     console.log("app_www = " + app_www);
 
-
     // Clear the www dir
     shell.rm('-rf', this.www_dir());
     shell.mkdir(this.www_dir());
 
     // Copy over all app www assets
     var srcPath = path.join(app_www,'*');
-    console.log('srcPath = ' + srcPath);
+
     var ls = shell.ls(srcPath);
-    console.log('ls ' + ls);
-    shell.cp('-Rf', srcPath, this.www_dir());
+    shell.cp('-rf', srcPath, this.www_dir());
     // Copy over stock platform www assets (cordova.js)
-    //shell.cp('-rf', path.join(platform_www, '*'), this.www_dir());
+    shell.cp('-rf', path.join(platform_www, '*'), this.www_dir());
 };
 
 browser_parser.prototype.update_overrides = function() {
     console.log("update_overrides");
     return;
 
-    var projectRoot = util.isCordova(this.path);
-    var mergesPath = path.join(util.appDir(projectRoot), 'merges', 'browser');
-    if(fs.existsSync(mergesPath)) {
-        var overrides = path.join(mergesPath, '*');
-        shell.cp('-rf', overrides, this.www_dir());
-    }
+    // var projectRoot = util.isCordova(this.path);
+    // var mergesPath = path.join(util.appDir(projectRoot), 'merges', 'browser');
+    // if(fs.existsSync(mergesPath)) {
+    //     var overrides = path.join(mergesPath, '*');
+    //     shell.cp('-rf', overrides, this.www_dir());
+    // }
 };
 
 browser_parser.prototype.config_xml = function(){

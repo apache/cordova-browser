@@ -11,8 +11,17 @@ var fs = require('fs');
 
 var CordovaLogger = require('cordova-common').CordovaLogger;
 var ConfigParser = require('cordova-common').ConfigParser;
+var ActionStack = require('cordova-common').ActionStack;
+var PluginInfo = require('cordova-common').PluginInfo;
 var selfEvents = require('cordova-common').events;
 var xmlHelpers = require('cordova-common').xmlHelpers;
+
+
+
+var PlatformJson = require('cordova-common').PlatformJson;
+
+var PlatformMunger = require('cordova-common').ConfigChanges.PlatformMunger;
+var PluginInfoProvider = require('cordova-common').PluginInfoProvider;
 
 var BrowserParser = require('./browser_parser');
 var PLATFORM_NAME = 'browser';
@@ -37,6 +46,7 @@ function Api(platform, platformRootDir, events) {
     this.events = setupEvents(events);
 
     this.parser = new BrowserParser(this.root);
+    this._handler = require('./browser_handler');
 
     this.locations = {
         platformRootDir: platformRootDir,
@@ -51,6 +61,10 @@ function Api(platform, platformRootDir, events) {
         cordovaJs: 'bin/templates/project/assets/www/cordova.js',
         cordovaJsSrc: 'cordova-js-src'
     };
+
+    this._platformJson = PlatformJson.load(this.root, platform);
+    this._pluginInfoProvider = new PluginInfoProvider();
+    this._munger = new PlatformMunger(platform, this.root, this._platformJson, this._pluginInfoProvider);
 }
 
 Api.createPlatform = function (dest, config, options, events) {
@@ -152,14 +166,268 @@ Api.prototype.prepare = function (cordovaProject,options) {
     return this.parser.update_project(this.config, options);
 };
 
-Api.prototype.addPlugin = function (plugin, installOptions) {
-    //console.log("NotImplemented :: browser-platform:Api:addPlugin ",plugin, installOptions);
-    return Promise.resolve();
+Api.prototype.addPlugin = function (pluginInfo, installOptions) {
+
+    // console.log(new Error().stack);
+
+
+    if (!pluginInfo) {
+        return Promise.reject('The parameter is incorrect. The first parameter ' +
+            'should be valid PluginInfo instance');
+    }
+
+    installOptions = installOptions || {};
+    installOptions.variables = installOptions.variables || {};
+    // CB-10108 platformVersion option is required for proper plugin installation
+    installOptions.platformVersion = installOptions.platformVersion ||
+        this.getPlatformInfo().version;
+
+    var self = this;
+    var actions = new ActionStack();
+    var projectFile = this._handler.parseProjectFile && this._handler.parseProjectFile(this.root);
+
+    // gather all files needs to be handled during install
+    pluginInfo.getFilesAndFrameworks(this.platform)
+        .concat(pluginInfo.getAssets(this.platform))
+        .concat(pluginInfo.getJsModules(this.platform))
+    .forEach(function(item) {
+        actions.push(actions.createAction(
+            self._getInstaller(item.itemType),
+            [item, pluginInfo.dir, pluginInfo.id, installOptions, projectFile],
+            self._getUninstaller(item.itemType),
+            [item, pluginInfo.dir, pluginInfo.id, installOptions, projectFile]));
+    });
+
+    // run through the action stack
+    return actions.process(this.platform, this.root)
+    .then(function () {
+        if (projectFile) {
+            projectFile.write();
+        }
+
+        // Add PACKAGE_NAME variable into vars
+        if (!installOptions.variables.PACKAGE_NAME) {
+            installOptions.variables.PACKAGE_NAME = self._handler.package_name(self.root);
+        }
+
+        self._munger
+            // Ignore passed `is_top_level` option since platform itself doesn't know
+            // anything about managing dependencies - it's responsibility of caller.
+            .add_plugin_changes(pluginInfo, installOptions.variables, /*is_top_level=*/true, /*should_increment=*/true)
+            .save_all();
+
+        var targetDir = installOptions.usePlatformWww ?
+            self.getPlatformInfo().locations.platformWww :
+            self.getPlatformInfo().locations.www;
+
+        self._addModulesInfo(pluginInfo, targetDir);
+    });
 };
 
 Api.prototype.removePlugin = function (plugin, uninstallOptions) {
     //console.log("NotImplemented :: browser-platform:Api:removePlugin ",plugin, uninstallOptions);
+
+    uninstallOptions = uninstallOptions || {};
+    // CB-10108 platformVersion option is required for proper plugin installation
+    uninstallOptions.platformVersion = uninstallOptions.platformVersion ||
+        this.getPlatformInfo().version;
+
+    var self = this;
+    var actions = new ActionStack();
+    var projectFile = this._handler.parseProjectFile && this._handler.parseProjectFile(this.root);
+
+    // queue up plugin files
+    plugin.getFilesAndFrameworks(this.platform)
+        .concat(plugin.getAssets(this.platform))
+        .concat(plugin.getJsModules(this.platform))
+    .forEach(function(item) {
+        actions.push(actions.createAction(
+            self._getUninstaller(item.itemType), [item, plugin.dir, plugin.id, uninstallOptions, projectFile],
+            self._getInstaller(item.itemType), [item, plugin.dir, plugin.id, uninstallOptions, projectFile]));
+    });
+
+    // run through the action stack
+    return actions.process(this.platform, this.root)
+    .then(function() {
+        if (projectFile) {
+            projectFile.write();
+        }
+
+        self._munger
+            // Ignore passed `is_top_level` option since platform itself doesn't know
+            // anything about managing dependencies - it's responsibility of caller.
+            .remove_plugin_changes(plugin, /*is_top_level=*/true)
+            .save_all();
+
+        var targetDir = uninstallOptions.usePlatformWww ?
+            self.getPlatformInfo().locations.platformWww :
+            self.getPlatformInfo().locations.www;
+
+        self._removeModulesInfo(plugin, targetDir);
+        // Remove stale plugin directory
+        // TODO: this should be done by plugin files uninstaller
+        shell.rm('-rf', path.resolve(self.root, 'Plugins', plugin.id));
+    });
+
     return Promise.resolve();
+};
+
+Api.prototype._getInstaller = function(type) {
+    var self = this;
+    return function (item, plugin_dir, plugin_id, options, project) {
+        var installer = self._handler[type];
+
+        if(!installer) {
+            console.log("unrecognized type " + type)
+            return;
+        }
+        else {
+            var wwwDest = options.usePlatformWww ?
+                    self.getPlatformInfo().locations.platformWww :
+                    self._handler.www_dir(self.root);
+
+            if(type === 'asset') {
+                installer.install(item, plugin_dir, wwwDest);
+            }
+            else if(type === 'js-module') {
+                installer.install(item, plugin_dir, plugin_id, wwwDest);
+            }
+            else {
+                installer.install(item, plugin_dir, self.root, plugin_id, options, project);
+            }
+
+// var installerArgs = type === 'asset' ? [wwwDest] :
+//     type === 'js-module' ? [plugin_id, wwwDest]:
+//     [self.root, plugin_id, options, project];
+// installer.install.apply(null, [item, plugin_dir].concat(installerArgs));
+        }
+    };
+};
+
+Api.prototype._getUninstaller = function(type) {
+    var self = this;
+    return function (item, plugin_dir, plugin_id, options, project) {
+        var installer = self._handler[type];
+
+        if(!installer) {
+            console.log("browser plugin uninstall: unrecognized type, skipping : " + type);
+            return;
+        }
+        else {
+            var wwwDest = options.usePlatformWww ?
+                self.getPlatformInfo().locations.platformWww :
+                self._handler.www_dir(self.root);
+
+            if(['asset','js-module'].indexOf(type) > -1) {
+                return installer.uninstall(item, wwwDest, plugin_id);
+            }
+            else {
+                return installer.uninstall(item, self.root, plugin_id, options, project);
+            }
+
+        }
+    };
+};
+
+/**
+ * Removes the specified modules from list of installed modules and updates
+ *   platform_json and cordova_plugins.js on disk.
+ *
+ * @param   {PluginInfo}  plugin  PluginInfo instance for plugin, which modules
+ *   needs to be added.
+ * @param   {String}  targetDir  The directory, where updated cordova_plugins.js
+ *   should be written to.
+ */
+Api.prototype._addModulesInfo = function(plugin, targetDir) {
+    var installedModules = this._platformJson.root.modules || [];
+
+    var installedPaths = installedModules.map(function (installedModule) {
+        return installedModule.file;
+    });
+
+    var modulesToInstall = plugin.getJsModules(this.platform)
+    .filter(function (moduleToInstall) {
+        return installedPaths.indexOf(moduleToInstall.file) === -1;
+    }).map(function (moduleToInstall) {
+        var moduleName = plugin.id + '.' + ( moduleToInstall.name || moduleToInstall.src.match(/([^\/]+)\.js/)[1] );
+        var obj = {
+            file: ['plugins', plugin.id, moduleToInstall.src].join('/'),
+            id: moduleName,
+            pluginId: plugin.id
+        };
+        if (moduleToInstall.clobbers.length > 0) {
+            obj.clobbers = moduleToInstall.clobbers.map(function(o) { return o.target; });
+        }
+        if (moduleToInstall.merges.length > 0) {
+            obj.merges = moduleToInstall.merges.map(function(o) { return o.target; });
+        }
+        if (moduleToInstall.runs) {
+            obj.runs = true;
+        }
+
+        return obj;
+    });
+
+    this._platformJson.root.modules = installedModules.concat(modulesToInstall);
+    if (!this._platformJson.root.plugin_metadata) {
+        this._platformJson.root.plugin_metadata = {};
+    }
+    this._platformJson.root.plugin_metadata[plugin.id] = plugin.version;
+
+    this._writePluginModules(targetDir);
+    this._platformJson.save();
+};
+/**
+ * Fetches all installed modules, generates cordova_plugins contents and writes
+ *   it to file.
+ *
+ * @param   {String}  targetDir  Directory, where write cordova_plugins.js to.
+ *   Ususally it is either <platform>/www or <platform>/platform_www
+ *   directories.
+ */
+Api.prototype._writePluginModules = function (targetDir) {
+    // Write out moduleObjects as JSON wrapped in a cordova module to cordova_plugins.js
+    var final_contents = 'cordova.define(\'cordova/plugin_list\', function(require, exports, module) {\n';
+    final_contents += 'module.exports = ' + JSON.stringify(this._platformJson.root.modules, null, '    ') + ';\n';
+    final_contents += 'module.exports.metadata = \n';
+    final_contents += '// TOP OF METADATA\n';
+    final_contents += JSON.stringify(this._platformJson.root.plugin_metadata || {}, null, '    ') + '\n';
+    final_contents += '// BOTTOM OF METADATA\n';
+    final_contents += '});'; // Close cordova.define.
+
+    shell.mkdir('-p', targetDir);
+    fs.writeFileSync(path.join(targetDir, 'cordova_plugins.js'), final_contents, 'utf-8');
+};
+
+
+/**
+ * Removes the specified modules from list of installed modules and updates
+ *   platform_json and cordova_plugins.js on disk.
+ *
+ * @param   {PluginInfo}  plugin  PluginInfo instance for plugin, which modules
+ *   needs to be removed.
+ * @param   {String}  targetDir  The directory, where updated cordova_plugins.js
+ *   should be written to.
+ */
+Api.prototype._removeModulesInfo = function(plugin, targetDir) {
+    var installedModules = this._platformJson.root.modules || [];
+    var modulesToRemove = plugin.getJsModules(this.platform)
+    .map(function (jsModule) {
+        return  ['plugins', plugin.id, jsModule.src].join('/');
+    });
+
+    var updatedModules = installedModules
+    .filter(function (installedModule) {
+        return (modulesToRemove.indexOf(installedModule.file) === -1);
+    });
+
+    this._platformJson.root.modules = updatedModules;
+    if (this._platformJson.root.plugin_metadata) {
+        delete this._platformJson.root.plugin_metadata[plugin.id];
+    }
+
+    this._writePluginModules(targetDir);
+    this._platformJson.save();
 };
 
 Api.prototype.build = function (buildOptions) {
