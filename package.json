@@ -32,6 +32,10 @@
         "jshint": "^2.6.0",
         "tmp": "^0.0.26"
     },
+    "engines": {
+        "node": ">=4.0.0"
+    },
+    "engineStrict": true,
     "bundledDependencies": [
         "adm-zip",
         "cordova-serve",
