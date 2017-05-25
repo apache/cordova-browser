@@ -36,6 +36,14 @@ function Config(xhr) {
 
 function readConfig(success, error) {
     var xhr;
+    // https://issues.apache.org/jira/browse/CB-11274
+    var pathsToTry = [
+        '/config.xml',
+        '/.config.xml',
+        '/' + cordova.platformId + '/www/config.xml',          // serve
+        '/' + cordova.platformId + '/assets/www/config.xml'    // serve (Android)
+    ];
+    var triedPathIndex = 0;
 
     if(typeof config != 'undefined') {
         success(config);
@@ -55,7 +63,19 @@ function readConfig(success, error) {
                 config = new Config(xhr);
                 success(config);
             }
-            else {
+            else if (xhr.status === 404) {
+                triedPathIndex++;
+
+                // Trying next path
+                if (triedPathIndex < pathsToTry.length) {
+                    try {
+                        xhr.open("get", pathsToTry[triedPathIndex], true);
+                        xhr.send();
+                    } catch(e) {
+                        fail('[Browser][cordova.js][xhrStatusChangeHandler] Could not XHR config.xml: ' + JSON.stringify(e));
+                    }
+                }
+            } else {
                 fail('[Browser][cordova.js][xhrStatusChangeHandler] Could not XHR config.xml: ' + xhr.statusText);
             }
         }
@@ -71,7 +91,7 @@ function readConfig(success, error) {
     }
 
     try {
-        xhr.open("get", "/config.xml", true);
+        xhr.open("get", pathsToTry[triedPathIndex], true);
         xhr.send();
     } catch(e) {
         fail('[Browser][cordova.js][readConfig] Could not XHR config.xml: ' + JSON.stringify(e));
