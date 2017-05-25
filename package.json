@@ -54,5 +54,9 @@
       "email": "purplecabbage@apache.org"
     }
   ],
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=4.0.0"
+  },
+  "engineStrict": true
 }
