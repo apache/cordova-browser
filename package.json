@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "jshint": "jshint bin && jshint spec",
-    "jasmine": "jasmine --captureExceptions --color",
+    "jasmine": "jasmine",
     "test": "npm run jshint && npm run jasmine"
   },
   "dependencies": {
@@ -26,7 +26,6 @@
     "cordova-common": "^2.0.1",
     "cordova-serve": "^1.0.0",
     "nopt": "^3.0.6",
-    "q": "^1.4.1",
     "shelljs": "^0.5.3"
   },
   "devDependencies": {
@@ -38,7 +37,6 @@
     "adm-zip",
     "cordova-serve",
     "nopt",
-    "q",
     "shelljs"
   ],
   "author": "Apache Software Foundation",
