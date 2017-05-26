@@ -96,6 +96,42 @@ Api.createPlatform = function (dest, config, options, events) {
         events.emit('error','createPlatform is not callable from the browser project API.');
         throw(e);
     }
+    
+    // Create manifest.json
+    var manifestJson;
+    var manifestJsonPath = path.join(dest,'manifest.json');
+
+    // Check if path exists and require manifestJsonPath.
+    if(fs.existsSync(manifestJsonPath)) {
+        try {
+            manifestJson = require(manifestJsonPath);
+        } 
+        catch (e) {
+            console.log("error : " + e);
+            events.emit('error', 'unable to require manifest.json path.');
+        }
+    } else if (manifestJson === undefined) {
+        manifestJson = {};
+        if(config){
+            if(config.name()) {
+                manifestJson.name = config.name();
+            }
+            if(config.shortName()) {
+                manifestJson.short_name = config.shortName();
+            }
+            if(config.packageName()) {
+                manifestJson.version = config.packageName();
+            }
+            if(config.description()) {
+                manifestJson.description = config.description();
+            }
+            if(config.author()) {
+                manifestJson.author = config.author();
+            }
+        }
+    }
+    fs.writeFileSync(manifestJsonPath, JSON.stringify(manifestJson, null, 4), 'utf8');
+
     return result;
 };
 
