@@ -26,6 +26,7 @@ var fs = require('fs'),
 
 module.exports.run = function(args) {
     // defaults
+    console.log('here');
     args.port =   args.port || 8000;
     args.target = args.target || "chrome"; // make default the system browser
 

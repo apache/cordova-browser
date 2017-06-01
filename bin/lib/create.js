@@ -19,12 +19,13 @@
  * under the License.
  */
 
-var fs = require('fs'),
-    shell = require('shelljs'),
-    args = process.argv,
-    path = require('path'),
-    ROOT    = path.join(__dirname, '..', '..'),
-    check_reqs = require('./check_reqs');
+var fs = require('fs');
+var shell = require('shelljs');
+var args = process.argv;
+var path = require('path');
+var ROOT    = path.join(__dirname, '..', '..');
+var ConfigParser = require('cordova-common').ConfigParser;
+var check_reqs = require('./check_reqs');
 
 module.exports.createProject = function(project_path,package_name,project_name){
 /*

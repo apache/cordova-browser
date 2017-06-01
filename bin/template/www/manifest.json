@@ -1,0 +1,20 @@
+{
+  "name": "My App",
+  "short_name":"My Ap",
+  "description": "Description of your app",
+  "start_url": "index.html",
+  "scope":"",
+  "icons": [{
+    "src": "",
+    "sizes": "48x48",
+    "type": "image/png"
+  }, {
+    "src": "",
+    "sizes": "72x72",
+    "type": "image/png"
+  }],
+  "default_locale": "en",
+  "display": "standalone",
+  "background_color":"#FFF",
+  "theme_color":"#000"
+}

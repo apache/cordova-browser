@@ -67,7 +67,6 @@ function Api(platform, platformRootDir, events) {
 Api.createPlatform = function (dest, config, options, events) {
     // console.log("=======================");
     // console.log("browser createPlatform !! dest:" + dest);
-    // console.log("config=",config);
     // console.log("options=",options);
     // console.log("events="+events);
 
@@ -78,11 +77,11 @@ Api.createPlatform = function (dest, config, options, events) {
         name = config.name();
         id = config.packageName();
     }
+
     var result;
     try {
 
         var creator = require('../../lib/create');
-        // console.log("creator = " + creator);
         result = creator.createProject(dest, id, name, options)
         .then(function () {
             // after platform is created we return Api instance based on new Api.js location
@@ -96,38 +95,37 @@ Api.createPlatform = function (dest, config, options, events) {
         events.emit('error','createPlatform is not callable from the browser project API.');
         throw(e);
     }
-    
+
     // Create manifest.json
-    var manifestJson;
-    var manifestJsonPath = path.join(dest,'manifest.json');
+    var manifestJson = {};
+    var manifestJsonPath = path.join(dest,'www','manifest.json');
 
     // Check if path exists and require manifestJsonPath.
     if(fs.existsSync(manifestJsonPath)) {
         try {
             manifestJson = require(manifestJsonPath);
-        } 
+        }
         catch (e) {
             console.log("error : " + e);
             events.emit('error', 'unable to require manifest.json path.');
         }
-    } else if (manifestJson === undefined) {
-        manifestJson = {};
-        if(config){
-            if(config.name()) {
-                manifestJson.name = config.name();
-            }
-            if(config.shortName()) {
-                manifestJson.short_name = config.shortName();
-            }
-            if(config.packageName()) {
-                manifestJson.version = config.packageName();
-            }
-            if(config.description()) {
-                manifestJson.description = config.description();
-            }
-            if(config.author()) {
-                manifestJson.author = config.author();
-            }
+    }
+
+    if(config){
+        if(config.name()) {
+            manifestJson.name = config.name();
+        }
+        if(config.shortName()) {
+            manifestJson.short_name = config.shortName();
+        }
+        if(config.packageName()) {
+            manifestJson.version = config.packageName();
+        }
+        if(config.description()) {
+            manifestJson.description = config.description();
+        }
+        if(config.author()) {
+            manifestJson.author = config.author();
         }
     }
     fs.writeFileSync(manifestJsonPath, JSON.stringify(manifestJson, null, 4), 'utf8');

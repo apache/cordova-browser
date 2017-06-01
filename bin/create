@@ -70,7 +70,8 @@ if (argv.help || !projectPath) {
     process.exit(0);
 }
 else {
-    var config = new ConfigParser(path.resolve(__dirname, 'template/config.xml'));
+    var configPath = path.resolve(__dirname, 'template/config.xml');
+    var config = new ConfigParser(configPath);
 
     // apply overrides (package and project names
     if (argv.argv.remain[1]) {
