@@ -3,18 +3,19 @@
   "short_name":"My Ap",
   "description": "Description of your app",
   "start_url": "index.html",
-  "scope":"",
+  "scope":"index.html",
   "icons": [{
-    "src": "",
-    "sizes": "48x48",
+    "src": "img/logo.png",
+    "sizes": "192x192",
     "type": "image/png"
   }, {
-    "src": "",
-    "sizes": "72x72",
+    "src": "img/splash.png",
+    "sizes": "512x512",
     "type": "image/png"
   }],
   "default_locale": "en",
   "display": "standalone",
   "background_color":"#FFF",
-  "theme_color":"#000"
+  "theme_color":"#000",
+  "orientation": "landscape"
 }
