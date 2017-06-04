@@ -96,7 +96,7 @@ browser_parser.prototype.config_xml = function(){
 
 // Returns a promise.
 browser_parser.prototype.update_project = function(cfg) {
-    console.log("update_project ",cfg)
+    //console.log("update_project ",cfg);
     var defer = this.update_from_config();
     var self = this;
     var www_dir = self.www_dir();
