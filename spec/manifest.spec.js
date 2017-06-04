@@ -60,19 +60,25 @@ function createAndBuild(projectname, projectid) {
     expect(manifestObj.theme_color).toBeDefined();
     // scope
     expect(manifestObj.scope).toBeDefined();
+    // orientation
+    expect(manifestObj.orientation).toBeDefined();
+    // icons
+    expect(manifestObj.icons).toBeDefined();
+    expect(Array.isArray(manifestObj.icons)).toBe(true);
+    expect(manifestObj.icons.length).toBeDefined();
+    expect(manifestObj.icons.length).toBeGreaterThan(0);
 
-    // related_applications[{platform:'web'},{platform:'play',url:...}],
-    // icons: [ {src,sizes,type}]
+
+    // related_applications[{platform:'web'},{platform:'play',url:...}]
 
     // clean-up
-    // shell.rm('-rf', tmpDir);
+    shell.rm('-rf', tmpDir);
 }
 
 
 fdescribe('create', function() {
 
-
-    it('create project with ascii name, no spaces', function() {
+    it('create project with manifest.json', function() {
         var projectname = 'testcreate';
         var projectid = 'com.test.app1';
 
