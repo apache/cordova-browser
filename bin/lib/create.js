@@ -25,19 +25,20 @@ var args = process.argv;
 var path = require('path');
 var ROOT    = path.join(__dirname, '..', '..');
 var ConfigParser = require('cordova-common').ConfigParser;
+var events = require('cordova-common').events;
 var check_reqs = require('./check_reqs');
+
 
 module.exports.createProject = function(project_path,package_name,project_name){
 /*
     // create the dest and the standard place for our api to live
     // platforms/platformName/cordova/Api.js
-
-    // TODO: other platforms emit log info
-    events.emit('log', 'Creating Cordova project for cordova-browser:');
-    events.emit('log', '\tPath: ' + dest);
-    events.emit('log', '\tName: ' + projectName);
-
 */
+
+    events.emit('log', 'Creating Cordova project for cordova-browser:');
+    events.emit('log', '\tPath: ' + project_path);
+    events.emit('log', '\tName: ' + project_name);
+
 
     var VERSION = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf-8');
 
@@ -81,6 +82,10 @@ module.exports.createProject = function(project_path,package_name,project_name){
 
     //copy cordova js file to platform_www
     shell.cp(path.join(ROOT, 'cordova-lib', 'cordova.js'),
+                   path.join(project_path,'platform_www'));
+
+    //copy cordova js file to platform_www
+    shell.cp(path.join(ROOT, 'bin/template/www', 'manifest.json'),
                    path.join(project_path,'platform_www'));
 
     return Promise.resolve();
