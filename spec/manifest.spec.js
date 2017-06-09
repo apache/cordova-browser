@@ -76,7 +76,7 @@ function createAndBuild(projectname, projectid) {
 }
 
 
-fdescribe('create', function() {
+describe('create', function() {
 
     it('create project with manifest.json', function() {
         var projectname = 'testcreate';

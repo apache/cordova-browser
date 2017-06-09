@@ -1,7 +1,7 @@
 {
   "name": "My App",
   "short_name":"My Ap",
-  "description": "Description of your app",
+  "description": "Description of your app from template",
   "start_url": "index.html",
   "scope":"index.html",
   "icons": [{

@@ -29,16 +29,15 @@ var events = require('cordova-common').events;
 var check_reqs = require('./check_reqs');
 
 
+// exported method to create a project, returns a promise that resolves with null
 module.exports.createProject = function(project_path,package_name,project_name){
 /*
     // create the dest and the standard place for our api to live
     // platforms/platformName/cordova/Api.js
 */
-
     events.emit('log', 'Creating Cordova project for cordova-browser:');
     events.emit('log', '\tPath: ' + project_path);
     events.emit('log', '\tName: ' + project_name);
-
 
     var VERSION = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf-8');
 
@@ -47,17 +46,13 @@ module.exports.createProject = function(project_path,package_name,project_name){
 
     // Check if project already exists
     if (fs.existsSync(project_path)) {
-        console.error('Project already exists! Delete and recreate');
-        process.exitCode = 2;
-        return;
+        events.emit('error','Oops, destination already exists! Delete it and try again');
     }
 
     // Check that requirements are met and proper targets are installed
     if (!check_reqs.run()) {
         // TODO: use events.emit
-        console.error('Please make sure you meet the software requirements in order to build a browser cordova project');
-        process.exitCode = 2;
-        return;
+        events.emit('error','Please make sure you meet the software requirements in order to build a browser cordova project');
     }
 
     //copy template/cordova directory ( recursive )
@@ -66,15 +61,13 @@ module.exports.createProject = function(project_path,package_name,project_name){
     //copy template/www directory ( recursive )
     shell.cp('-r', path.join(ROOT, 'bin/template/www'),  project_path);
 
-        //copy required node_modules
-    shell.cp('-r', path.join(ROOT, 'node_modules'), path.join(project_path,'cordova'));
+    // recreate our node_modules structure in the new project
+    shell.cp('-r', path.join(ROOT, 'node_modules'),
+                   path.join(project_path,'cordova'));
 
     //copy check_reqs file
-    shell.cp(path.join(ROOT, 'bin/lib/check_reqs.js'), path.join(project_path,'cordova/lib'));
-
-    //copy cordova js file
-    shell.cp(path.join(ROOT, 'cordova-lib', 'cordova.js'),
-                   path.join(project_path,'www'));
+    shell.cp(path.join(ROOT, 'bin/lib/check_reqs.js'),
+             path.join(project_path,'cordova/lib'));
 
     //copy cordova-js-src directory
     shell.cp('-rf', path.join(ROOT, 'cordova-js-src'),
@@ -82,11 +75,11 @@ module.exports.createProject = function(project_path,package_name,project_name){
 
     //copy cordova js file to platform_www
     shell.cp(path.join(ROOT, 'cordova-lib', 'cordova.js'),
-                   path.join(project_path,'platform_www'));
+             path.join(project_path,'platform_www'));
 
-    //copy cordova js file to platform_www
+    //copy manifest file to platform_www
     shell.cp(path.join(ROOT, 'bin/template/www', 'manifest.json'),
-                   path.join(project_path,'platform_www'));
+             path.join(project_path,'platform_www'));
 
     return Promise.resolve();
 };
