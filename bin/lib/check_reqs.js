@@ -19,8 +19,8 @@ specific language governing permissions and limitations
 under the License.
 */
 
-//add methods as we determine what are the requirements
+// add methods as we determine what are the requirements
 
-module.exports.run = function() {
+module.exports.run = function () {
     return Promise.resolve();
 };

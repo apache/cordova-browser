@@ -19,49 +19,47 @@
  * under the License.
  */
 
-var fs = require('fs'),
-    path = require('path'),
-    url = require('url'),
-    shell = require('shelljs'),
-    cordovaServe = require('cordova-serve');
+var fs = require('fs');
+var path = require('path');
+var url = require('url');
+var cordovaServe = require('cordova-serve');
 
-module.exports.run = function(args) {
+module.exports.run = function (args) {
     // defaults
-    args.port =   args.port || 8000;
-    args.target = args.target || "chrome"; // make default the system browser
+    args.port = args.port || 8000;
+    args.target = args.target || 'chrome'; // make default the system browser
 
-    var wwwPath = path.join(__dirname,'../../www');
-    var manifestFilePath = path.resolve(path.join(wwwPath,'manifest.json'));
+    var wwwPath = path.join(__dirname, '../../www');
+    var manifestFilePath = path.resolve(path.join(wwwPath, 'manifest.json'));
 
     var startPage;
 
     // get start page from manifest
-    if(fs.existsSync(manifestFilePath)) {
+    if (fs.existsSync(manifestFilePath)) {
         try {
             var manifest = require(manifestFilePath);
             startPage = manifest.start_url;
-        }
-        catch(err) {
-            console.log("failed to require manifest ... " + err);
+        } catch (err) {
+            console.log('failed to require manifest ... ' + err);
         }
     }
 
     var server = cordovaServe();
     server.servePlatform('browser', {port: args.port, noServerInfo: true})
-    .then(function () {
-        if(!startPage) {
-            // failing all else, set the default
-            startPage = 'index.html';
-        }
-        var projectUrl = url.resolve('http://localhost:' + server.port + '/', startPage);
-        console.log('startPage = ' + startPage);
-        console.log('Static file server running @ ' + projectUrl + '\nCTRL + C to shut down');
-        return cordovaServe.launchBrowser({"target": args.target, "url": projectUrl});
-    })
-    .catch(function (error) {
-        console.log(error.message || error.toString());
-        if (server.server) {
-            server.server.close();
-        }
-    });
+        .then(function () {
+            if (!startPage) {
+                // failing all else, set the default
+                startPage = 'index.html';
+            }
+            var projectUrl = url.resolve('http://localhost:' + server.port + '/', startPage);
+            console.log('startPage = ' + startPage);
+            console.log('Static file server running @ ' + projectUrl + '\nCTRL + C to shut down');
+            return cordovaServe.launchBrowser({'target': args.target, 'url': projectUrl});
+        })
+        .catch(function (error) {
+            console.log(error.message || error.toString());
+            if (server.server) {
+                server.server.close();
+            }
+        });
 };

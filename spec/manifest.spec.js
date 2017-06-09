@@ -24,9 +24,9 @@ var util = require('util');
 
 var cordova_bin = path.join(__dirname, '../bin');// is this the same on all platforms?
 var tmpDir = path.join(__dirname, '../temp');
-var createScriptPath = path.join(cordova_bin,'create');
+var createScriptPath = path.join(cordova_bin, 'create');
 
-function createAndBuild(projectname, projectid) {
+function createAndBuild (projectname, projectid) {
 
     var return_code = 0;
     var command;
@@ -41,17 +41,17 @@ function createAndBuild(projectname, projectid) {
     return_code = shell.exec(command).code;
     expect(return_code).toBe(0);
 
-    var platWwwPath = path.join(tmpDir,projectname,"platform_www");
+    var platWwwPath = path.join(tmpDir, projectname, 'platform_www');
 
-    var manifestPath = path.join(platWwwPath,'manifest.json');
+    var manifestPath = path.join(platWwwPath, 'manifest.json');
     expect(fs.existsSync(manifestPath)).toBe(true);
 
     var manifestObj = require(manifestPath);
     expect(manifestObj.name).toBe(projectname);
     // start_url
-    expect(manifestObj.start_url).toBe("index.html");
+    expect(manifestObj.start_url).toBe('index.html');
     // display
-    expect(manifestObj.display).toBe("standalone");
+    expect(manifestObj.display).toBe('standalone');
     // description
     expect(manifestObj.description).toBeDefined();
     // background_color
@@ -74,10 +74,9 @@ function createAndBuild(projectname, projectid) {
     shell.rm('-rf', tmpDir);
 }
 
+describe('create', function () {
 
-describe('create', function() {
-
-    it('create project with manifest.json', function() {
+    it('create project with manifest.json', function () {
         var projectname = 'testcreate';
         var projectid = 'com.test.app1';
 

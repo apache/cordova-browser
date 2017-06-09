@@ -19,49 +19,49 @@
  * under the License.
  */
 
-var fs = require('fs'),
-    path = require('path'),
-    shell = require('shelljs'),
-    clean   = require('./clean'),
-    check_reqs = require('./check_reqs');
+var fs = require('fs');
+var path = require('path');
+var shell = require('shelljs');
+var clean = require('./clean');
+var check_reqs = require('./check_reqs');
 
 /**
  * run
  *   Creates a zip file int platform/build folder
  */
-module.exports.run = function(){
+module.exports.run = function () {
 
     var resultP = check_reqs.run();
-    resultP.then(function(){
+    resultP.then(function () {
         return clean.run();
     });
-    resultP.then(function() {
-        var wwwPath = path.join(__dirname,'../../www');
+    resultP.then(function () {
+        var wwwPath = path.join(__dirname, '../../www');
 
         // generate a generic service worker
         var lsdir = shell.find(wwwPath);
         var pathLength = wwwPath.length;
-        var cleanedFileList = lsdir.filter(function(elem) {
+        var cleanedFileList = lsdir.filter(function (elem) {
             // skip directory names, and cordova-js-src
             return !fs.statSync(elem).isDirectory() &&
                     elem.indexOf('cordova-js-src') < 0;
-        }).map(function(elem) {
+        }).map(function (elem) {
             return elem.substr(pathLength);
         });
 
-        var swJSPath = path.join(wwwPath,'cordova-sw.js');
+        var swJSPath = path.join(wwwPath, 'cordova-sw.js');
         var swJS = fs.readFileSync(swJSPath, 'utf8');
 
-        swJS = swJS.replace('%CACHE_VERSION%',Date.now());
-        swJS = swJS.replace("['CACHE_VALUES']",JSON.stringify(cleanedFileList,null,4));
+        swJS = swJS.replace('%CACHE_VERSION%', Date.now());
+        swJS = swJS.replace("['CACHE_VALUES']", JSON.stringify(cleanedFileList, null, 4));
 
         fs.writeFileSync(swJSPath, swJS, 'utf8');
     });
     return resultP;
 };
 
-module.exports.help = function() {
+module.exports.help = function () {
     console.log('Usage: cordova build browser');
-    var wwwPath = path.resolve(path.join(__dirname,'../../www'));
+    var wwwPath = path.resolve(path.join(__dirname, '../../www'));
     console.log("Build will create the packaged app in '" + wwwPath + "'.");
 };

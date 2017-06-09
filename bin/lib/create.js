@@ -21,16 +21,13 @@
 
 var fs = require('fs');
 var shell = require('shelljs');
-var args = process.argv;
 var path = require('path');
-var ROOT    = path.join(__dirname, '..', '..');
-var ConfigParser = require('cordova-common').ConfigParser;
+var ROOT = path.join(__dirname, '..', '..');
 var events = require('cordova-common').events;
 var check_reqs = require('./check_reqs');
 
-
 // exported method to create a project, returns a promise that resolves with null
-module.exports.createProject = function(project_path,package_name,project_name){
+module.exports.createProject = function (project_path, package_name, project_name) {
 /*
     // create the dest and the standard place for our api to live
     // platforms/platformName/cordova/Api.js
@@ -40,56 +37,54 @@ module.exports.createProject = function(project_path,package_name,project_name){
     events.emit('log', '\tPath: ' + project_path);
     events.emit('log', '\tName: ' + project_name);
 
-    var VERSION = fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf-8');
-
     // Set default values for path, package and name
-    project_path = project_path || "CordovaExample";
+    project_path = project_path || 'CordovaExample';
 
     // Check if project already exists
     if (fs.existsSync(project_path)) {
-        events.emit('error','Oops, destination already exists! Delete it and try again');
+        events.emit('error', 'Oops, destination already exists! Delete it and try again');
     }
 
     // Check that requirements are met and proper targets are installed
     if (!check_reqs.run()) {
         // TODO: use events.emit
-        events.emit('error','Please make sure you meet the software requirements in order to build a browser cordova project');
+        events.emit('error', 'Please make sure you meet the software requirements in order to build a browser cordova project');
     }
 
-    //copy template/cordova directory ( recursive )
-    shell.cp('-r', path.join(ROOT, 'bin/template/cordova'),  project_path);
+    // copy template/cordova directory ( recursive )
+    shell.cp('-r', path.join(ROOT, 'bin/template/cordova'), project_path);
 
-    //copy template/www directory ( recursive )
-    shell.cp('-r', path.join(ROOT, 'bin/template/www'),  project_path);
+    // copy template/www directory ( recursive )
+    shell.cp('-r', path.join(ROOT, 'bin/template/www'), project_path);
 
     // recreate our node_modules structure in the new project
     shell.cp('-r', path.join(ROOT, 'node_modules'),
-                   path.join(project_path,'cordova'));
+        path.join(project_path, 'cordova'));
 
-    //copy check_reqs file
+    // copy check_reqs file
     shell.cp(path.join(ROOT, 'bin/lib/check_reqs.js'),
-             path.join(project_path,'cordova/lib'));
+        path.join(project_path, 'cordova/lib'));
 
-    var platform_www = path.join(project_path,'platform_www');
+    var platform_www = path.join(project_path, 'platform_www');
 
-    //copy cordova-js-src directory
-    shell.cp('-rf', path.join(ROOT, 'cordova-js-src'),platform_www);
+    // copy cordova-js-src directory
+    shell.cp('-rf', path.join(ROOT, 'cordova-js-src'), platform_www);
 
-    //copy cordova js file to platform_www
-    shell.cp(path.join(ROOT, 'cordova-lib', 'cordova.js'),platform_www);
+    // copy cordova js file to platform_www
+    shell.cp(path.join(ROOT, 'cordova-lib', 'cordova.js'), platform_www);
 
-    //copy favicon file to platform_www
-    shell.cp(path.join(ROOT, 'bin/template/www/favicon.ico'),platform_www);
+    // copy favicon file to platform_www
+    shell.cp(path.join(ROOT, 'bin/template/www/favicon.ico'), platform_www);
 
     // load manifest to write name/shortname
     var manifest = require(path.join(ROOT, 'bin/template/www', 'manifest.json'));
     manifest.name = project_name;
     manifest.short_name = project_name;
     // copy manifest file to platform_www
-    fs.writeFileSync(path.join(platform_www,'manifest.json'),
-                     JSON.stringify(manifest, null, 2), 'utf-8');
+    fs.writeFileSync(path.join(platform_www, 'manifest.json'),
+        JSON.stringify(manifest, null, 2), 'utf-8');
     // copy service worker
-    shell.cp(path.join(ROOT, 'bin/template/www', 'cordova-sw.js'),platform_www);
+    shell.cp(path.join(ROOT, 'bin/template/www', 'cordova-sw.js'), platform_www);
 
     return Promise.resolve();
 };

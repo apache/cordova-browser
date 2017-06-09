@@ -24,9 +24,9 @@ var util = require('util');
 
 var cordova_bin = path.join(__dirname, '../bin');// is this the same on all platforms?
 var tmpDir = path.join(__dirname, '../temp');
-var createScriptPath = path.join(cordova_bin,'create');
+var createScriptPath = path.join(cordova_bin, 'create');
 
-function createAndBuild(projectname, projectid) {
+function createAndBuild (projectname, projectid) {
 
     var return_code = 0;
     var command;
@@ -37,27 +37,25 @@ function createAndBuild(projectname, projectid) {
 
     // create the project
     command = util.format('"%s" "%s/%s" "%s" "%s"', createScriptPath, tmpDir, projectname, projectid, projectname);
-    //shell.echo(command);
+    // shell.echo(command);
     return_code = shell.exec(command).code;
     expect(return_code).toBe(0);
 
+    var tempCordovaScriptsPath = path.join(tmpDir, projectname, 'cordova');
 
-    var tempCordovaScriptsPath = path.join(tmpDir,projectname,"cordova");
-
-    console.log("tempCordovaScriptsPath = " + tempCordovaScriptsPath);
+    console.log('tempCordovaScriptsPath = ' + tempCordovaScriptsPath);
 
     // created project has scripts in the cordova folder
     // build, clean, log, run, version
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath,'build'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath,'clean'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath,'log'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath,'run'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath,'version'))).toBe(true);
-
+    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'build'))).toBe(true);
+    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'clean'))).toBe(true);
+    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'log'))).toBe(true);
+    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'run'))).toBe(true);
+    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'version'))).toBe(true);
 
     // // build the project
     command = util.format('"%s/cordova/build"', path.join(tmpDir, projectname));
-    //shell.echo(command);
+    // shell.echo(command);
     return_code = shell.exec(command, { silent: true }).code;
     expect(return_code).toBe(0);
 
@@ -65,50 +63,48 @@ function createAndBuild(projectname, projectid) {
     shell.rm('-rf', tmpDir);
 }
 
+describe('create', function () {
 
-describe('create', function() {
-
-    it('has a create script in bin/cordova',function(){
+    it('has a create script in bin/cordova', function () {
         expect(fs.existsSync(createScriptPath)).toBe(true);
     });
 
-
-    it('create project with ascii name, no spaces', function() {
+    it('create project with ascii name, no spaces', function () {
         var projectname = 'testcreate';
         var projectid = 'com.test.app1';
 
         createAndBuild(projectname, projectid);
     });
 
-    it('create project with ascii name, and spaces', function() {
+    it('create project with ascii name, and spaces', function () {
         var projectname = 'test create';
         var projectid = 'com.test.app2';
 
         createAndBuild(projectname, projectid);
     });
 
-    it('create project with unicode name, no spaces', function() {
+    it('create project with unicode name, no spaces', function () {
         var projectname = '応応応応用用用用';
         var projectid = 'com.test.app3';
 
         createAndBuild(projectname, projectid);
     });
 
-    it('create project with unicode name, and spaces', function() {
+    it('create project with unicode name, and spaces', function () {
         var projectname = '応応応応 用用用用';
         var projectid = 'com.test.app4';
 
         createAndBuild(projectname, projectid);
     });
 
-    it('create project with ascii+unicode name, no spaces', function() {
+    it('create project with ascii+unicode name, no spaces', function () {
         var projectname = '応応応応hello用用用用';
         var projectid = 'com.test.app5';
 
         createAndBuild(projectname, projectid);
     });
 
-    it('create project with ascii+unicode name, and spaces', function() {
+    it('create project with ascii+unicode name, and spaces', function () {
         var projectname = '応応応応 hello 用用用用';
         var projectid = 'com.test.app6';
 
@@ -116,4 +112,3 @@ describe('create', function() {
     });
 
 });
-
