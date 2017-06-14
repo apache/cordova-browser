@@ -41,7 +41,7 @@ function createAndBuild(projectname, projectid) {
     return_code = shell.exec(command).code;
     expect(return_code).toBe(0);
 
-    var platWwwPath = path.join(tmpDir,projectname,"www");
+    var platWwwPath = path.join(tmpDir,projectname,"platform_www");
 
     var manifestPath = path.join(platWwwPath,'manifest.json');
     expect(fs.existsSync(manifestPath)).toBe(true);
@@ -68,8 +68,7 @@ function createAndBuild(projectname, projectid) {
     expect(manifestObj.icons.length).toBeDefined();
     expect(manifestObj.icons.length).toBeGreaterThan(0);
 
-
-    // related_applications[{platform:'web'},{platform:'play',url:...}]
+    // related_applications[{platform:'web'},{platform:'play',url:...}] ?
 
     // clean-up
     shell.rm('-rf', tmpDir);

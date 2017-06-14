@@ -26,37 +26,52 @@ var fs = require('fs'),
 
 module.exports.run = function(args) {
     // defaults
-    console.log('here');
     args.port =   args.port || 8000;
     args.target = args.target || "chrome"; // make default the system browser
 
-    var root = path.join(__dirname, '../');
-    var configFilePath = path.resolve(path.join(root, 'config.xml'));
+    var wwwPath = path.join(__dirname,'../../www');
+    var configFilePath = path.resolve(path.join(wwwPath, 'config.xml'));
+    var manifestFilePath = path.resolve(path.join(wwwPath,'manifest.json'));
+
     var startPage;
-    if(fs.existsSync(configFilePath)) {
+
+    // get start page from manifest first, if available(it should always be)
+    // if not found, get it from config.xml
+    // if still not found, use default of 'index.html'
+
+    if(fs.existsSync(manifestFilePath)) {
+        try {
+            var manifest = require(manifestFilePath);
+            startPage = manifest.start_url;
+        }
+        catch(err) {
+            console.log("failed to require manifest ... " + err);
+        }
+    }
+
+    if(!startPage && fs.existsSync(configFilePath)) {
         var configXML = fs.readFileSync(configFilePath, 'utf8');
         // pull out <content src='SOME_URL'/>
-        startPage = /<content[\s]+?src\s*=\s*"(.*?)"/i.exec(configXML);
+        var result = /<content[\s]+?src\s*=\s*"(.*?)"/i.exec(configXML);
+        if(result) {
+            startPage = result[1];
+        }
     }
 
 
-
-
     var server = cordovaServe();
-
     server.servePlatform('browser', {port: args.port, noServerInfo: true})
     .then(function () {
         if(!startPage) {
+            // failing all else, set the default
             startPage = 'index.html';
-        }
-        else {
-            startPage = startPage[1];
         }
         var projectUrl = url.resolve('http://localhost:' + server.port + '/', startPage);
         console.log('startPage = ' + startPage);
         console.log('Static file server running @ ' + projectUrl + '\nCTRL + C to shut down');
-        return cordovaServe.launchBrowser({target: args.target, url: projectUrl});
-    }).catch(function (error) {
+        return cordovaServe.launchBrowser({"target": args.target, "url": projectUrl});
+    })
+    .catch(function (error) {
         console.log(error.message || error.toString());
         if (server.server) {
             server.server.close();

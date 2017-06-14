@@ -78,8 +78,13 @@ module.exports.createProject = function(project_path,package_name,project_name){
              path.join(project_path,'platform_www'));
 
     //copy manifest file to platform_www
-    shell.cp(path.join(ROOT, 'bin/template/www', 'manifest.json'),
-             path.join(project_path,'platform_www'));
+    var platform_www = path.join(project_path,'platform_www');
+    // load manifest to write name/shortname
+    var manifest = require(path.join(ROOT, 'bin/template/www', 'manifest.json'));
+    manifest.name = project_name;
+    manifest.short_name = project_name;
+    fs.writeFileSync(path.join(project_path,'platform_www','manifest.json'),
+                     JSON.stringify(manifest, null, 2), 'utf-8');
 
     return Promise.resolve();
 };

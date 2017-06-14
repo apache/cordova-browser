@@ -39,16 +39,17 @@ function setupEvents(externalEventEmitter) {
 function Api(platform, platformRootDir, events) {
 
     this.platform = platform || PLATFORM_NAME;
+
+    // MyApp/platforms/browser
     this.root = path.resolve(__dirname, '..');
     this.events = setupEvents(events);
-
     this.parser = new BrowserParser(this.root);
     this._handler = require('./browser_handler');
 
     this.locations = {
         platformRootDir: platformRootDir,
         root: this.root,
-        www: path.join(this.root, 'assets/www'),
+        www: path.join(this.root, 'www'),
         res: path.join(this.root, 'res'),
         platformWww: path.join(this.root, 'platform_www'),
         configXml: path.join(this.root, 'config.xml'),
@@ -65,12 +66,10 @@ function Api(platform, platformRootDir, events) {
 }
 
 Api.createPlatform = function (dest, config, options, events) {
-    // console.log("=======================");
-    // console.log("browser createPlatform !! dest:" + dest);
-    // console.log("options=",options);
-    // console.log("events="+events);
 
+    var creator = require('../../lib/create');
     events = setupEvents(events);
+
     var name = "HelloCordova";
     var id = "io.cordova.hellocordova";
     if(config) {
@@ -80,56 +79,20 @@ Api.createPlatform = function (dest, config, options, events) {
 
     var result;
     try {
-
-        var creator = require('../../lib/create');
+        // we create the project using our scripts in this platform
         result = creator.createProject(dest, id, name, options)
         .then(function () {
             // after platform is created we return Api instance based on new Api.js location
+            // Api.js has been copied to the new project
             // This is required to correctly resolve paths in the future api calls
             var PlatformApi = require(path.resolve(dest, 'cordova/Api'));
             return new PlatformApi('browser', dest, events);
         });
     }
     catch(e) {
-        console.log("error : " + e);
         events.emit('error','createPlatform is not callable from the browser project API.');
         throw(e);
     }
-
-    // Create manifest.json
-    var manifestJson = {};
-    var manifestJsonPath = path.join(dest,'www','manifest.json');
-
-    // Check if path exists and require manifestJsonPath.
-    if(fs.existsSync(manifestJsonPath)) {
-        try {
-            manifestJson = require(manifestJsonPath);
-        }
-        catch (e) {
-            console.log("error : " + e);
-            events.emit('error', 'unable to require manifest.json path.');
-        }
-    }
-
-    if(config){
-        if(config.name()) {
-            manifestJson.name = config.name();
-        }
-        if(config.shortName()) {
-            manifestJson.short_name = config.shortName();
-        }
-        if(config.packageName()) {
-            manifestJson.version = config.packageName();
-        }
-        if(config.description()) {
-            manifestJson.description = config.description();
-        }
-        if(config.author()) {
-            manifestJson.author = config.author();
-        }
-    }
-    fs.writeFileSync(manifestJsonPath, JSON.stringify(manifestJson, null, 4), 'utf8');
-
     return result;
 };
 
@@ -147,7 +110,7 @@ Api.prototype.getPlatformInfo = function () {
         "locations":this.locations,
         "root": this.root,
         "name": this.platform,
-        "version": { "version" : "1.0.0" },
+        "version": { "version" : "1.0.0" }, // um, todo!
         "projectConfig": this.config
     };
 };
@@ -155,43 +118,126 @@ Api.prototype.getPlatformInfo = function () {
 Api.prototype.prepare = function (cordovaProject,options) {
 
     // First cleanup current config and merge project's one into own
-    var defaultConfig = path.join(this.locations.platformRootDir,'cordova',
+    var defaultConfigPath = path.join(this.locations.platformRootDir,'cordova',
                         'defaults.xml');
-
-    var ownConfig = this.locations.configXml;
-
+    var ownConfigPath = this.locations.configXml;
     var sourceCfg = cordovaProject.projectConfig;
+
     // If defaults.xml is present, overwrite platform config.xml with it.
     // Otherwise save whatever is there as defaults so it can be
     // restored or copy project config into platform if none exists.
-    if (fs.existsSync(defaultConfig)) {
+    if (fs.existsSync(defaultConfigPath)) {
         this.events.emit('verbose', 'Generating config.xml from defaults for platform "' + this.platform + '"');
-        shell.cp('-f', defaultConfig, ownConfig);
-    } else if (fs.existsSync(ownConfig)) {
-        shell.cp('-f', ownConfig, defaultConfig);
-    } else {
-        shell.cp('-f', sourceCfg.path, ownConfig);
+        shell.cp('-f', defaultConfigPath, ownConfigPath);
+    }
+    else if (fs.existsSync(ownConfigPath)) {
+        this.events.emit('verbose', 'Generating defaults.xml from own config.xml for platform "' + this.platform + '"');
+        shell.cp('-f', ownConfigPath, defaultConfigPath);
+    }
+    else {
+        this.events.emit('verbose', 'case 3"' + this.platform + '"');
+        shell.cp('-f', sourceCfg.path, ownConfigPath);
     }
 
-    // this._munger.reapply_global_munge().save_all();
-
-    this.config = new ConfigParser(ownConfig);
+    // merge our configs
+    this.config = new ConfigParser(ownConfigPath);
     xmlHelpers.mergeXml(cordovaProject.projectConfig.doc.getroot(),
-        this.config.doc.getroot(), this.platform, true);
+                        this.config.doc.getroot(),
+                        this.platform, true);
     this.config.write();
-
-    /*
-        "browser": {
-        "parser_file": "../cordova/metadata/browser_parser",
-        "handler_file": "../plugman/platforms/browser",
-        "url": "https://git-wip-us.apache.org/repos/asf?p=cordova-browser.git",
-        "version": "~4.1.0",
-        "deprecated": false
-    }
-    */
 
     // Update own www dir with project's www assets and plugins' assets and js-files
     this.parser.update_www(cordovaProject.locations.www);
+
+    // Copy or Create manifest.json
+    // todo: move this to a manifest helper module
+    // output path
+    var manifestPath = path.join(this.locations.www,'manifest.json');
+    var srcManifestPath =path.join(cordovaProject.locations.www,'manifest.json');
+    if(fs.existsSync(srcManifestPath)) {
+        // just blindly copy it to our output/www
+        // todo: validate it? ensure all properties we expect exist?
+        this.events.emit('verbose','copying ' + srcManifestPath + ' => ' + manifestPath);
+        shell.cp('-f',srcManifestPath,manifestPath);
+    }
+    else {
+        var manifestJson = {
+            "background_color": "#000",
+            "display": "standalone"
+        };
+        if(this.config){
+            if(this.config.name()) {
+                manifestJson.name = this.config.name();
+            }
+            if(this.config.shortName()) {
+                manifestJson.short_name = this.config.shortName();
+            }
+            if(this.config.packageName()) {
+                manifestJson.version = this.config.packageName();
+            }
+            if(this.config.description()) {
+                manifestJson.description = this.config.description();
+            }
+            if(this.config.author()) {
+                manifestJson.author = this.config.author();
+            }
+            // icons
+            var icons = this.config.getStaticResources('browser','icon');
+            var manifestIcons = icons.map(function(icon) {
+                // given a tag like this :
+                // <icon src="res/ios/icon.png" width="57" height="57" density="mdpi" />
+                /* configParser returns icons that look like this :
+                {   src: 'res/ios/icon.png',
+                    target: undefined,
+                    density: 'mdpi',
+                    platform: null,
+                    width: 57,
+                    height: 57
+                } ******/
+                /* manifest expects them to be like this :
+                {   "src": "images/touch/icon-128x128.png",
+                    "type": "image/png",
+                    "sizes": "128x128"
+                } ******/
+                // ?Is it worth looking at file extentions?
+                return {"src":icon.src, "type":"image/png",
+                        "sizes":(icon.width + "x" + icon.height)};
+            });
+            manifestJson.icons = manifestIcons;
+
+            // orientation
+            // <preference name="Orientation" value="landscape" />
+            var oriPref = this.config.getGlobalPreference('Orientation');
+            if(oriPref && ["landscape","portrait"].indexOf(oriPref) > -1) {
+                manifestJson.orientation = oriPref;
+            }
+
+            // get start_url
+            var contentNode = this.config.doc.find('content') || {'attrib':{'src':'index.html'}}; // sensible default
+            manifestJson.start_url = contentNode.attrib.src;
+
+            // now we get some values from start_url page ...
+            var startUrlPath = path.join(cordovaProject.locations.www,manifestJson.start_url);
+            if(fs.existsSync(startUrlPath)) {
+                var contents = fs.readFileSync(startUrlPath, 'utf-8');
+                // matches <meta name="theme-color" content="#FF0044">
+                var themeColorRegex = /<meta(?=[^>]*name="theme-color")\s[^>]*content="([^>]*)"/i;
+                var result = themeColorRegex.exec(contents);
+                var themeColor;
+                if(result && result.length>=2) {
+                    themeColor = result[1];
+                }
+                else { // see if there is a preference in config.xml
+                    // <preference name="StatusBarBackgroundColor" value="#000000" />
+                    themeColor = this.config.getGlobalPreference('StatusBarBackgroundColor');
+                }
+                if(themeColor) {
+                    manifestJson.theme_color = themeColor;
+                }
+            }
+        }
+        fs.writeFileSync(manifestPath, JSON.stringify(manifestJson, null, 2), 'utf8');
+    }
 
     // update project according to config.xml changes.
     return this.parser.update_project(this.config, options);
