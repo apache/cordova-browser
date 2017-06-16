@@ -8,9 +8,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -927,15 +927,15 @@ module.exports = function (success, fail, service, action, args) {
     args = args || [];
 
     if (proxy) {
-        
+
         var callbackId = service + cordova.callbackId++;
-        
+
         if (typeof success === "function" || typeof fail === "function") {
             cordova.callbacks[callbackId] = {success: success, fail: fail};
         }
         try {
 
-            
+
 
             // callbackOptions param represents additional optional parameters command could pass back, like keepCallback or
             // custom callbackId, for example {callbackId: id, keepCallback: true, status: cordova.callbackStatus.JSON_EXCEPTION }
@@ -987,7 +987,7 @@ module.exports = function (success, fail, service, action, args) {
     } else {
 
         console.log("Error: exec proxy not found for :: " + service + " :: " + action);
-        
+
         if(typeof fail === "function" ) {
             fail("Missing Command Error");
         }
@@ -1485,6 +1485,27 @@ module.exports = {
     cordovaVersion: '3.4.0',
 
     bootstrap: function() {
+
+        var cache = navigator.serviceWorker.register;
+        var cacheCalled = false;
+        navigator.serviceWorker.register = function() {
+            cacheCalled = true;
+            navigator.serviceWorker.register = cache;
+            return cache.apply(navigator.serviceWorker,arguments);
+        }
+
+        document.addEventListener('deviceready',function(){
+            console.log('cache called = ' + cacheCalled);
+            if(!cacheCalled) {
+                navigator.serviceWorker.register('/cordova-sw.js').then(function(registration) {
+                    // Registration was successful
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    // registration failed :(
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            }
+        });
 
         var modulemapper = require('cordova/modulemapper');
         var channel = require('cordova/channel');
