@@ -1495,7 +1495,6 @@ module.exports = {
         }
 
         document.addEventListener('deviceready',function(){
-            console.log('cache called = ' + cacheCalled);
             if(!cacheCalled) {
                 navigator.serviceWorker.register('/cordova-sw.js').then(function(registration) {
                     // Registration was successful

@@ -31,14 +31,11 @@ module.exports.run = function(args) {
     args.target = args.target || "chrome"; // make default the system browser
 
     var wwwPath = path.join(__dirname,'../../www');
-    var configFilePath = path.resolve(path.join(wwwPath, 'config.xml'));
     var manifestFilePath = path.resolve(path.join(wwwPath,'manifest.json'));
 
     var startPage;
 
-    // get start page from manifest first, if available(it should always be)
-    // if not found, get it from config.xml
-    // if still not found, use default of 'index.html'
+    // get start page from manifest
     if(fs.existsSync(manifestFilePath)) {
         try {
             var manifest = require(manifestFilePath);
@@ -48,36 +45,6 @@ module.exports.run = function(args) {
             console.log("failed to require manifest ... " + err);
         }
     }
-
-    // realistically, I don't believe this is ever called,
-    // given that we always generate a manifest with the correct info
-    if(!startPage && fs.existsSync(configFilePath)) {
-        var configXML = fs.readFileSync(configFilePath, 'utf8');
-        // pull out <content src='SOME_URL'/>
-        var result = /<content[\s]+?src\s*=\s*"(.*?)"/i.exec(configXML);
-        if(result) {
-            startPage = result[1];
-        }
-    }
-
-    // generate a generic service worker
-    var lsdir = shell.find(wwwPath);
-    var pathLength = wwwPath.length;
-    var cleanedFileList = lsdir.filter(function(elem) {
-        // skip directory names, and cordova-js-src
-        return !fs.statSync(elem).isDirectory() &&
-                elem.indexOf('cordova-js-src') < 0;
-    }).map(function(elem) {
-        return elem.substr(pathLength);
-    });
-
-    var swJSPath = path.join(wwwPath,'cordova-sw.js');
-    var swJS = fs.readFileSync(swJSPath, 'utf8');
-
-    swJS = swJS.replace('%CACHE_VERSION%',Date.now());
-    swJS = swJS.replace("['CACHE_VALUES']",JSON.stringify(cleanedFileList,null,4));
-
-    fs.writeFileSync(swJSPath, swJS, 'utf8');
 
     var server = cordovaServe();
     server.servePlatform('browser', {port: args.port, noServerInfo: true})

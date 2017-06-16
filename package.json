@@ -22,7 +22,6 @@
     "test": "npm run jshint && npm run jasmine"
   },
   "dependencies": {
-    "adm-zip": "^0.4.7",
     "cordova-common": "^2.0.1",
     "cordova-serve": "^1.0.0",
     "nopt": "^3.0.6",
