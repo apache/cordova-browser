@@ -23,7 +23,7 @@ var fs = require('fs'),
     shell = require('shelljs'),
     path = require('path'),
     check_reqs = require('./check_reqs'),
-    platformBuildDir = path.join('platforms', 'browser', 'build');
+    platformBuildDir = path.join('platforms', 'browser', 'www');
 
 var run = function(){
 
