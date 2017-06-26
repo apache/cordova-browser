@@ -35,6 +35,7 @@ module.exports.createProject = function(project_path,package_name,project_name){
     // create the dest and the standard place for our api to live
     // platforms/platformName/cordova/Api.js
 */
+
     events.emit('log', 'Creating Cordova project for cordova-browser:');
     events.emit('log', '\tPath: ' + project_path);
     events.emit('log', '\tName: ' + project_name);
@@ -69,26 +70,26 @@ module.exports.createProject = function(project_path,package_name,project_name){
     shell.cp(path.join(ROOT, 'bin/lib/check_reqs.js'),
              path.join(project_path,'cordova/lib'));
 
+    var platform_www = path.join(project_path,'platform_www');
+
     //copy cordova-js-src directory
-    shell.cp('-rf', path.join(ROOT, 'cordova-js-src'),
-                    path.join(project_path, 'platform_www'));
+    shell.cp('-rf', path.join(ROOT, 'cordova-js-src'),platform_www);
 
     //copy cordova js file to platform_www
-    shell.cp(path.join(ROOT, 'cordova-lib', 'cordova.js'),
-             path.join(project_path,'platform_www'));
+    shell.cp(path.join(ROOT, 'cordova-lib', 'cordova.js'),platform_www);
 
-    //copy manifest file to platform_www
-    var platform_www = path.join(project_path,'platform_www');
+    //copy favicon file to platform_www
+    shell.cp(path.join(ROOT, 'bin/template/www/favicon.ico'),platform_www);
+
     // load manifest to write name/shortname
     var manifest = require(path.join(ROOT, 'bin/template/www', 'manifest.json'));
     manifest.name = project_name;
     manifest.short_name = project_name;
-    fs.writeFileSync(path.join(project_path,'platform_www','manifest.json'),
+    // copy manifest file to platform_www
+    fs.writeFileSync(path.join(platform_www,'manifest.json'),
                      JSON.stringify(manifest, null, 2), 'utf-8');
     // copy service worker
-    shell.cp(path.join(ROOT, 'bin/template/www', 'cordova-sw.js'),
-             path.join(project_path,'platform_www'));
-
+    shell.cp(path.join(ROOT, 'bin/template/www', 'cordova-sw.js'),platform_www);
 
     return Promise.resolve();
 };
