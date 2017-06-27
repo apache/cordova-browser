@@ -69,13 +69,11 @@ browser_parser.prototype.update_www = function() {
     shell.rm('-rf', my_www);
     shell.mkdir(my_www);
 
-    // Copy over all app www assets
-    var srcPath = path.join(app_www,'*');
-
-    var ls = shell.ls(srcPath);
-    shell.cp('-rf', srcPath, my_www);
     // Copy over stock platform www assets (cordova.js)
     shell.cp('-rf', path.join(platform_www, '*'), my_www);
+
+    // Copy over all app www assets ( overwriting stock )
+    shell.cp('-rf', path.join(app_www,'*'), my_www);
 };
 
 browser_parser.prototype.update_overrides = function() {
