@@ -162,7 +162,7 @@ Api.prototype.prepare = function (cordovaProject,options) {
     }
     else {
         var manifestJson = {
-            "background_color": "#000",
+            "background_color": "#FFF",
             "display": "standalone"
         };
         if(this.config){
@@ -208,8 +208,14 @@ Api.prototype.prepare = function (cordovaProject,options) {
             // orientation
             // <preference name="Orientation" value="landscape" />
             var oriPref = this.config.getGlobalPreference('Orientation');
-            if(oriPref && ["landscape","portrait"].indexOf(oriPref) > -1) {
-                manifestJson.orientation = oriPref;
+            if(oriPref) {
+                // if it's a supported value, use it
+                if(["landscape","portrait"].indexOf(oriPref) > -1) {
+                    manifestJson.orientation = oriPref;
+                }
+                else { // anything else maps to 'any'
+                    manifestJson.orientation = 'any';
+                }
             }
 
             // get start_url
