@@ -19,5 +19,9 @@ this.addEventListener('activate', function(event) {
 
 this.addEventListener('fetch', function(event) {
     console.log("cordova service worker : fetch : " + event.request.url);
-    event.respondWith(caches.match(event.request));
+
+    event.respondWith(caches.match(event.request).then(function(response) {
+        // Cache hit? return response else fetch it
+        return response || fetch(event.request);
+    }));
 });
