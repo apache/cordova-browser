@@ -24,7 +24,7 @@
 
 # Cordova Browser
 
-Target modern web browsers to build Cordova based applications.
+Target modern web browsers to build Apache Cordova based applications.
 
 # Goals
 
