@@ -22,7 +22,6 @@
 var fs = require('fs');
 var path = require('path');
 var shell = require('shelljs');
-var clean = require('./clean');
 var check_reqs = require('./check_reqs');
 
 /**
@@ -32,9 +31,7 @@ var check_reqs = require('./check_reqs');
 module.exports.run = function () {
 
     var resultP = check_reqs.run();
-    resultP.then(function () {
-        return clean.run();
-    });
+
     resultP.then(function () {
         var wwwPath = path.join(__dirname, '../../www');
 
