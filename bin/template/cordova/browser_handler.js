@@ -111,5 +111,20 @@ module.exports = {
         uninstall: function (obj, project_dir, plugin_id, options) {
             events.emit('verbose', 'lib-file.uninstall is not supported for browser');
         }
+    },
+    asset: {
+        install: function (asset, plugin_dir, wwwDest) {
+            var src = path.join(plugin_dir, asset.src);
+            if (fs.statSync(src).isDirectory()) {
+                src = path.join(src, '*');
+            }
+            var dest = path.join(wwwDest, asset.target);
+
+            shell.cp('-rf', src, dest);
+        },
+        uninstall: function (asset, wwwDest, plugin_id) {
+            shell.rm('-rf', path.join(wwwDest, asset.target));
+            shell.rm('-rf', path.join(wwwDest, 'plugins', plugin_id));
+        }
     }
 };
