@@ -1,5 +1,5 @@
 // Platform: browser
-// 5a1bffcf410d1696d5701b3eaa9bca9b0859480d
+// f623343b9ff11fbe7c72d319932cc1fd3fdafed2
 /*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -34,7 +34,7 @@ var require,
         requireStack = [],
     // Map of module ID -> index into requireStack of modules currently being built.
         inProgressModules = {},
-        SEPARATOR = "/";
+        SEPARATOR = ".";
 
 
 
