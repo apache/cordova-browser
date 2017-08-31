@@ -24,6 +24,26 @@ module.exports = {
     cordovaVersion: '4.2.0', // cordova-js
 
     bootstrap: function() {
+        
+        var cache = navigator.serviceWorker.register;
+        var cacheCalled = false;
+        navigator.serviceWorker.register = function() {
+            cacheCalled = true;
+            navigator.serviceWorker.register = cache;
+            return cache.apply(navigator.serviceWorker,arguments);
+        }
+
+        document.addEventListener('deviceready',function(){
+            if(!cacheCalled) {
+                navigator.serviceWorker.register('/cordova-sw.js').then(function(registration) {
+                    // Registration was successful
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    // registration failed :(
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            }
+        });
 
         var modulemapper = require('cordova/modulemapper');
         var channel = require('cordova/channel');
