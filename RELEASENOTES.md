@@ -20,6 +20,11 @@
 -->
 ## Release Notes for Cordova Browser ##
 
+### 5.0.1 (Oct 16, 2017)
+* [CB-13444](https://issues.apache.org/jira/browse/CB-13444) Updated checked-in `node_modules`
+* [CB-13435](https://issues.apache.org/jira/browse/CB-13435) fix merges directory support for **Browser**
+* [CB-12895](https://issues.apache.org/jira/browse/CB-12895) ignoring `cordova.js` for `eslint`
+
 ### 5.0.0 (Aug 24, 2017)
 * [CB-13214](https://issues.apache.org/jira/browse/CB-13214) Updated `cordova-serve` dependnecy to 2.0.0. `cordova serve` command now opens system default browser instead of a new instance of `chrome`. A specific target can still be passed in. 
 * [CB-13214](https://issues.apache.org/jira/browse/CB-13214) Updated checked-in `node_modules`

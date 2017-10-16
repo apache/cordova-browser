@@ -1,6 +1,6 @@
 {
   "name": "cordova-browser",
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "cordova-browser release",
   "main": "bin/template/cordova/Api.js",
   "bin": "bin/create",
@@ -22,7 +22,7 @@
     "test": "npm run eslint && npm run jasmine"
   },
   "dependencies": {
-    "cordova-common": "^2.0.1",
+    "cordova-common": "^2.1.1",
     "cordova-serve": "^2.0.0",
     "nopt": "^3.0.6",
     "shelljs": "^0.5.3"
@@ -39,10 +39,10 @@
     "tmp": "^0.0.26"
   },
   "bundledDependencies": [
-    "adm-zip",
     "cordova-serve",
     "nopt",
-    "shelljs"
+    "shelljs",
+    "cordova-common"
   ],
   "author": "Apache Software Foundation",
   "contributors": [
