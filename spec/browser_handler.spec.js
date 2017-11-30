@@ -63,7 +63,7 @@ describe('Asset install tests', function () {
         };
         spyOn(fs, 'statSync').and.returnValue(fsstatMock);
         browser_handler.asset.install(assetPath, plugin_dir, wwwDest);
-        expect(mkdir).toHaveBeenCalledWith('dest/js/deepdown');
+        expect(mkdir).toHaveBeenCalledWith('-p', 'dest/js/deepdown');
         expect(cp).toHaveBeenCalledWith('-f', 'pluginDir/someSrc/reformat.js', 'dest/js/deepdown/reformat.js');
     });
 });
