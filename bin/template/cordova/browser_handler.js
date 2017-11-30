@@ -120,6 +120,7 @@ module.exports = {
             if (fs.statSync(src).isDirectory()) {
                 shell.cp('-Rf', src + '/*', dest);
             } else {
+                shell.mkdir(path.parse(dest).dir);
                 shell.cp('-f', src, dest);
             }
         },
