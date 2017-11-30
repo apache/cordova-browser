@@ -28,7 +28,6 @@ describe('Asset install tests', function () {
     var assetPath = { itemType: 'asset', src: 'someSrc/reformat.js', target: 'js/deepdown/reformat.js' };
     var plugin_dir = 'pluginDir';
     var wwwDest = 'dest';
-    // var cpPath = path.join(plugin_dir, asset.src);
 
     it('if src is a directory, should be called with cp, -Rf', function () {
         var cp = spyOn(shell, 'cp').and.returnValue('-Rf');
