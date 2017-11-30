@@ -121,7 +121,7 @@ module.exports = {
                 shell.cp('-Rf', src + '/*', dest);
             } else {
                 if (path.parse(asset.target).dir !== '') {
-                    shell.mkdir(path.parse(dest).dir);
+                    shell.mkdir('-p', path.parse(dest).dir);
                 }
                 shell.cp('-f', src, dest);
             }
