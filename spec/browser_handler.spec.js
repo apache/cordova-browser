@@ -24,8 +24,8 @@ var path = require('path');
 
 describe('Asset install tests', function () {
     var fsstatMock;
-    var asset = { itemType: 'asset', src: 'someSrc/ServiceWorker.js', target: 'ServiceWorker.js' };
-    var assetPath = { itemType: 'asset', src: 'someSrc/reformat.js', target: 'js/deepdown/reformat.js' };
+    var asset = { itemType: 'asset', src: path.join('someSrc', 'ServiceWorker.js'), target: 'ServiceWorker.js' };
+    var assetWithPath = { itemType: 'asset', src: path.join('someSrc', 'reformat.js'), target: path.join('js', 'deepdown', 'reformat.js') };
     var plugin_dir = 'pluginDir';
     var wwwDest = 'dest';
 
@@ -51,7 +51,7 @@ describe('Asset install tests', function () {
         spyOn(fs, 'statSync').and.returnValue(fsstatMock);
         browser_handler.asset.install(asset, plugin_dir, wwwDest);
         expect(mkdir).not.toHaveBeenCalled();
-        expect(cp).toHaveBeenCalledWith('-f', 'pluginDir/someSrc/ServiceWorker.js', 'dest/ServiceWorker.js');
+        expect(cp).toHaveBeenCalledWith('-f', path.join('pluginDir', 'someSrc', 'ServiceWorker.js'), path.join('dest', 'ServiceWorker.js'));
     });
     it('if src is not a directory and asset has a path, should be called with cp, -f', function () {
         var cp = spyOn(shell, 'cp').and.returnValue('-f');
@@ -62,8 +62,8 @@ describe('Asset install tests', function () {
             }
         };
         spyOn(fs, 'statSync').and.returnValue(fsstatMock);
-        browser_handler.asset.install(assetPath, plugin_dir, wwwDest);
-        expect(mkdir).toHaveBeenCalledWith('-p', 'dest/js/deepdown');
-        expect(cp).toHaveBeenCalledWith('-f', 'pluginDir/someSrc/reformat.js', 'dest/js/deepdown/reformat.js');
+        browser_handler.asset.install(assetWithPath, plugin_dir, wwwDest);
+        expect(mkdir).toHaveBeenCalledWith('-p', path.join('dest', 'js', 'deepdown'));
+        expect(cp).toHaveBeenCalledWith('-f', path.join('pluginDir', 'someSrc', 'reformat.js'), path.join('dest', 'js', 'deepdown', 'reformat.js'));
     });
 });
