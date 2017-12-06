@@ -25,14 +25,14 @@ var path = require('path');
 describe('Asset install tests', function () {
     var fsstatMock;
     var asset = { itemType: 'asset',
-                  src: path.join('someSrc', 'ServiceWorker.js'),
-                  target: 'ServiceWorker.js' };
+        src: path.join('someSrc', 'ServiceWorker.js'),
+        target: 'ServiceWorker.js' };
     var assetWithPath = { itemType: 'asset',
-                          src: path.join('someSrc', 'reformat.js'),
-                          target: path.join('js', 'deepdown', 'reformat.js') };
+        src: path.join('someSrc', 'reformat.js'),
+        target: path.join('js', 'deepdown', 'reformat.js') };
     var assetWithPath2 = { itemType: 'asset',
-                           src: path.join('someSrc', 'reformat.js'),
-                           target: path.join('js', 'deepdown', 'reformat2.js') };
+        src: path.join('someSrc', 'reformat.js'),
+        target: path.join('js', 'deepdown', 'reformat2.js') };
 
     var plugin_dir = 'pluginDir';
     var wwwDest = 'dest';
@@ -51,7 +51,7 @@ describe('Asset install tests', function () {
     it('if src is not a directory and asset has no path, should be called with cp, -f', function () {
         var cp = spyOn(shell, 'cp').and.returnValue('-f');
         var mkdir = spyOn(shell, 'mkdir');
-        var exSync = spyOn(fs, 'existsSync').and.returnValue(true);
+        spyOn(fs, 'existsSync').and.returnValue(true);
         fsstatMock = {
             isDirectory: function () {
                 return false;
@@ -82,10 +82,9 @@ describe('Asset install tests', function () {
         /*
             Now test that a second call to the same dest folder skips mkdir because the first asset call should have created it.
         */
-        var exSync = spyOn(fs, 'existsSync').and.returnValue(true);
+        spyOn(fs, 'existsSync').and.returnValue(true);
         browser_handler.asset.install(assetWithPath2, plugin_dir, wwwDest);
         expect(mkdir.calls.count()).toBe(1); // not called again
-
 
     });
 });

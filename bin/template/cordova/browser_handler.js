@@ -117,7 +117,7 @@ module.exports = {
             var src = path.join(plugin_dir, asset.src);
             var dest = path.join(wwwDest, asset.target);
             var destDir = path.parse(dest).dir;
-            if(destDir != '' && !fs.existsSync(destDir)) {
+            if (destDir !== '' && !fs.existsSync(destDir)) {
                 shell.mkdir('-p', destDir);
             }
 
