@@ -22,8 +22,8 @@
     "test": "npm run eslint && npm run jasmine"
   },
   "dependencies": {
-    "cordova-common": "^2.1.1",
-    "cordova-serve": "^2.0.0",
+    "cordova-common": "2.2.5",
+    "cordova-serve": "2.0.1",
     "nopt": "^3.0.6",
     "shelljs": "^0.5.3"
   },
