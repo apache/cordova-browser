@@ -1,5 +1,5 @@
 // Platform: browser
-// 4450a4cea50616e080a82e8ede9e3d6a1fe3c3ec
+// 61a51908ef1d6e96a92e9e65e3c7166a39192f29
 /*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -19,7 +19,7 @@
  under the License.
 */
 ;(function() {
-var PLATFORM_VERSION_BUILD_LABEL = '5.0.3';
+var PLATFORM_VERSION_BUILD_LABEL = '5.0.4-dev';
 // file: src/scripts/require.js
 
 /* jshint -W079 */
@@ -836,7 +836,7 @@ module.exports = channel;
 
 });
 
-// file: /Users/steveng/repo/cordova/cordova-browser/cordova-js-src/confighelper.js
+// file: /Users/brodybits/Documents/cordova/cordova-browser/cordova-js-src/confighelper.js
 define("cordova/confighelper", function(require, exports, module) {
 
 var config;
@@ -911,7 +911,7 @@ exports.readConfig = readConfig;
 
 });
 
-// file: /Users/steveng/repo/cordova/cordova-browser/cordova-js-src/exec.js
+// file: /Users/brodybits/Documents/cordova/cordova-browser/cordova-js-src/exec.js
 define("cordova/exec", function(require, exports, module) {
 
 /*jslint sloppy:true, plusplus:true*/
@@ -1486,7 +1486,7 @@ exports.reset();
 
 });
 
-// file: /Users/steveng/repo/cordova/cordova-browser/cordova-js-src/platform.js
+// file: /Users/brodybits/Documents/cordova/cordova-browser/cordova-js-src/platform.js
 define("cordova/platform", function(require, exports, module) {
 
 module.exports = {
