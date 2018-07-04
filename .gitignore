@@ -5,3 +5,4 @@ temp
 *.jar
 .vscode
 node_modules/.bin
+package-lock.json
