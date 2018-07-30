@@ -20,6 +20,11 @@
 -->
 ## Release Notes for Cordova Browser ##
 
+### 5.0.4 (Jul 30, 2018)
+* [CB-14145](https://issues.apache.org/jira/browse/CB-14145) update dependencies to resolve `npm audit` issues, pinned in `5.0.x` only ([GH-53](https://github.com/apache/cordova-browser/pull/53))
+* [CB-9366](https://issues.apache.org/jira/browse/CB-9366) - log `error.stack` in `cordova.js` (update from `cordova-js@4.2.4`) in `5.0.x`
+* Add Node.js 10 to AppVeyor CI and Travis CI (`5.0.x`)
+
 ### 5.0.3 (Dec 20, 2017)
 * [CB-13689](https://issues.apache.org/jira/browse/CB-13689) Update `node_modules` (contents committed)
 * [8560888](https://github.com/apache/cordova-browser/commit/85608884499571ddda34155e349e6cc61cd9b834) - LINTINGOMGURSOSTRICT fix to `bin/template/cordova/browser_handler.js`
