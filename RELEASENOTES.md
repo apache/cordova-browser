@@ -20,6 +20,16 @@
 -->
 ## Release Notes for Cordova Browser ##
 
+### 5.0.3 (Dec 20, 2017)
+* [CB-13689](https://issues.apache.org/jira/browse/CB-13689) Update `node_modules` (contents committed)
+* [8560888](https://github.com/apache/cordova-browser/commit/85608884499571ddda34155e349e6cc61cd9b834) - LINTINGOMGURSOSTRICT fix to `bin/template/cordova/browser_handler.js`
+* [CB-13614](https://issues.apache.org/jira/browse/CB-13614)
+  - Fixed case where src was a folder and dest was a folder that did not exist, added test to prove it ([GH-49](https://github.com/apache/cordova-browser/pull/49)).
+  - create intermediate file paths
+  - Fix tests for **Windows** style paths
+* [CB-13562](https://issues.apache.org/jira/browse/CB-13562) fixed asset tag when adding push plugin to **Browser**
+* [CB-13501](https://issues.apache.org/jira/browse/CB-13501) explicit support for Node.js 8 in AppVeyor CI and Travis CI testing
+
 ### 5.0.2 (Dec 18, 2017)
 * [CB-13689](https://issues.apache.org/jira/browse/CB-13689): Updated checked-in node_modules
 * [CB-13562](https://issues.apache.org/jira/browse/CB-13562): fixed asset tag when adding push plugin to **Browser**
