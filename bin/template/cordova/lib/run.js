@@ -28,6 +28,7 @@ module.exports.run = function (args) {
     // defaults
     args.port = args.port || 8000;
     args.target = args.target || 'default'; // make default the system browser
+    args.noLogOutput = args.silent || false;
 
     var wwwPath = path.join(__dirname, '../../www');
     var manifestFilePath = path.resolve(path.join(wwwPath, 'manifest.json'));
@@ -45,7 +46,7 @@ module.exports.run = function (args) {
     }
 
     var server = cordovaServe();
-    server.servePlatform('browser', {port: args.port, noServerInfo: true})
+    server.servePlatform('browser', {port: args.port, noServerInfo: true, noLogOutput: args.noLogOutput})
         .then(function () {
             if (!startPage) {
                 // failing all else, set the default
