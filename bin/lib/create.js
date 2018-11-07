@@ -27,7 +27,7 @@ var events = require('cordova-common').events;
 var check_reqs = require('./check_reqs');
 
 // exported method to create a project, returns a promise that resolves with null
-module.exports.createProject = function (project_path, package_name, project_name) {
+module.exports.createProject = function (project_path, package_name, project_name, options) {
 /*
     // create the dest and the standard place for our api to live
     // platforms/platformName/cordova/Api.js
@@ -58,8 +58,7 @@ module.exports.createProject = function (project_path, package_name, project_nam
     shell.cp('-r', path.join(ROOT, 'bin/template/www'), project_path);
 
     // recreate our node_modules structure in the new project
-    shell.cp('-r', path.join(ROOT, 'node_modules'),
-        path.join(project_path, 'cordova'));
+    if (options && options.copyPlatformNodeModules) shell.cp('-r', path.join(ROOT, 'node_modules'), path.join(project_path, 'cordova'));
 
     // copy check_reqs file
     shell.cp(path.join(ROOT, 'bin/lib/check_reqs.js'),
