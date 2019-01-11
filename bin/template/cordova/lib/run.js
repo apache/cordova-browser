@@ -46,16 +46,18 @@ module.exports.run = function (args) {
     }
 
     var server = cordovaServe();
-    server.servePlatform('browser', {port: args.port, noServerInfo: true, noLogOutput: args.noLogOutput})
+    server.servePlatform('browser', { port: args.port, noServerInfo: true, noLogOutput: args.noLogOutput })
         .then(function () {
             if (!startPage) {
                 // failing all else, set the default
                 startPage = 'index.html';
             }
-            var projectUrl = url.resolve('http://localhost:' + server.port + '/', startPage);
+
+            var projectUrl = (new url.URL(`http://localhost:${server.port}/${startPage}`)).href;
+
             console.log('startPage = ' + startPage);
             console.log('Static file server running @ ' + projectUrl + '\nCTRL + C to shut down');
-            return server.launchBrowser({'target': args.target, 'url': projectUrl});
+            return server.launchBrowser({ 'target': args.target, 'url': projectUrl });
         })
         .catch(function (error) {
             console.log(error.message || error.toString());
