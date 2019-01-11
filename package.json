@@ -35,8 +35,8 @@
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "jasmine": "^2.5.3",
-    "tmp": "^0.0.26"
+    "jasmine": "^3.3.1",
+    "tmp": "0.0.33"
   },
   "author": "Apache Software Foundation",
   "contributors": [
