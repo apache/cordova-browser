@@ -1,6 +1,6 @@
 {
   "name": "cordova-browser",
-  "version": "6.0.0",
+  "version": "6.1.0-dev",
   "description": "cordova-browser release",
   "main": "bin/template/cordova/Api.js",
   "bin": "bin/create",
