@@ -26,7 +26,7 @@ if (['--help', '/?', '-h', 'help', '-help', '/help'].indexOf(process.argv[2]) > 
 } else {
     update.run(process.argv).then(() => {
         console.log('Successfully updated browser project.');
-    }, (err) => {
+    }, err => {
         console.error('Update failed due to', err);
         process.exit(2);
     });
