@@ -17,10 +17,10 @@
        under the License.
 */
 
-var Q = require('q');
 var create = require('./create');
 var fs = require('fs');
 var shell = require('shelljs');
+const { CordovaError } = require('cordova-common');
 
 module.exports.help = function () {
     console.log('WARNING : Make sure to back up your project before updating!');
@@ -32,15 +32,17 @@ module.exports.help = function () {
 
 module.exports.run = function (argv) {
     var projectPath = argv[2];
+
+    // If the specified project path is not valid then reject promise.
     if (!fs.existsSync(projectPath)) {
-        // if specified project path is not valid then reject promise
-        Q.reject('Browser platform does not exist here: ' + projectPath);
+        return Promise.reject(new CordovaError(`Browser platform does not exist here: ${projectPath}`));
     }
-    return Q().then(function () {
-        console.log('Removing existing browser platform.');
-        shellfatal(shell.rm, '-rf', projectPath);
-        create.createProject(projectPath);
-    });
+
+    console.log('Removing existing browser platform.');
+    shellfatal(shell.rm, '-rf', projectPath);
+
+    // Create Project returns a resolved promise.
+    return create.createProject(projectPath);
 };
 
 function shellfatal (shellFunc) {
