@@ -23,11 +23,10 @@ var build = require('./lib/build');
 var args = process.argv;
 
 // provide help
-if (args[2] == '--help' || args[2] == '/?' || args[2] == '-h' || args[2] == '/h' ||
-                    args[2] == 'help' || args[2] == '-help' || args[2] == '/help') {
+const helpOptions = '--help /? -h /h help -help /help'.split(' ');
+if (helpOptions.includes(args[2])) {
     build.help();
     process.exit(0);
 } else {
-
     build.run();
 }

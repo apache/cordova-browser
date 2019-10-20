@@ -19,12 +19,8 @@
        under the License.
 */
 
-var fs = require('fs');
-var path = require('path');
 var nopt = require('nopt');
-var url = require('url');
 var runForrest = require('./lib/run');
-var cordovaServe = require('cordova-serve');
 
 var args = process.argv;
 

@@ -24,9 +24,8 @@ var clean = require('./lib/clean');
 var args = process.argv;
 
 // Support basic help commands
-if (args.length > 2
-   || args[2] == '--help' || args[2] == '/?' || args[2] == '-h' ||
-                    args[2] == 'help' || args[2] == '-help' || args[2] == '/help') {
+const helpOptions = '--help /? -h /h help -help /help'.split(' ');
+if (args.length > 2 || helpOptions.includes(args[2])) {
     console.log('Usage: ' + path.relative(process.cwd(), path.join(__dirname, 'clean')));
     process.exit(0);
 } else {

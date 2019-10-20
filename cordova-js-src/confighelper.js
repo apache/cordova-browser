@@ -50,8 +50,8 @@ function readConfig (success, error) {
     }
 
     var xhrStatusChangeHandler = function () {
-        if (xhr.readyState == 4) {
-            if (xhr.status == 200 || xhr.status == 304 || xhr.status === 0 /* file:// */) {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200 || xhr.status === 304 || xhr.status === 0 /* file:// */) {
                 config = new Config(xhr);
                 success(config);
             } else {
