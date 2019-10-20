@@ -19,12 +19,11 @@
        under the License.
 */
 
-
-var build = require('./lib/build'),
-    args  = process.argv;
+var build = require('./lib/build');
+var args = process.argv;
 
 // provide help
-if ( args[2] == '--help' || args[2] == '/?' || args[2] == '-h' || args[2] == '/h' ||
+if (args[2] == '--help' || args[2] == '/?' || args[2] == '-h' || args[2] == '/h' ||
                     args[2] == 'help' || args[2] == '-help' || args[2] == '/help') {
     build.help();
     process.exit(0);
