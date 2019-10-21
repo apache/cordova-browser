@@ -428,9 +428,9 @@ Api.prototype._addModulesInfo = function (plugin, targetDir) {
         .filter(function (moduleToInstall) {
             return installedPaths.indexOf(moduleToInstall.file) === -1;
         }).map(function (moduleToInstall) {
-            var moduleName = plugin.id + '.' + (moduleToInstall.name || moduleToInstall.src.match(/([^\/]+)\.js/)[1]);
+            var moduleName = plugin.id + '.' + (moduleToInstall.name || moduleToInstall.src.match(/([^/]+)\.js/)[1]);
             var obj = {
-                file: ['plugins', plugin.id, moduleToInstall.src].join('/'), /* eslint no-useless-escape : 0 */
+                file: ['plugins', plugin.id, moduleToInstall.src].join('/'),
                 id: moduleName,
                 pluginId: plugin.id
             };

@@ -17,4 +17,4 @@
        under the License.
 */
 
-console.log("cordova/log");
+console.log('cordova/log');
