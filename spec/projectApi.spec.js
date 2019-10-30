@@ -17,10 +17,11 @@
  under the License.
  */
 
-var Api = require('../bin/template/cordova/Api');
-var shell = require('shelljs');
-var path = require('path');
-var tmpDir = path.join(__dirname, './temp');
+const path = require('path');
+const EventEmitter = require('events');
+
+const Api = require('../bin/template/cordova/Api');
+const create = require('../bin/lib/create');
 
 describe('can get the Api', function () {
 
@@ -28,24 +29,9 @@ describe('can get the Api', function () {
         expect(Api).toBeDefined();
     });
 
-    it('should export static createPlatform function', function (done) {
+    it('should export static createPlatform function', function () {
         expect(Api.createPlatform).toBeDefined();
         expect(typeof Api.createPlatform).toBe('function');
-
-        // TODO: make this do something real
-        var promise = Api.createPlatform(tmpDir);
-        expect(promise).toBeDefined();
-        expect(promise.then).toBeDefined();
-        promise.then(function (res) {
-            console.log('result = ' + res);
-            shell.rm('-rf', tmpDir);
-            done();
-        },
-        function (err) {
-            console.log('spec-error ' + err);
-            shell.rm('-rf', tmpDir);
-            done();
-        });
     });
 
     it('should export static updatePlatform function', function () {
@@ -53,6 +39,21 @@ describe('can get the Api', function () {
         expect(typeof Api.updatePlatform).toBe('function');
     });
 
+    describe('static createPlatform method', () => {
+        it('should create a platform app and return the Api', () => {
+            // Trick function under test to load our Api after calling createProject
+            const testDir = path.join(__dirname, '../bin/template');
+            const testOpts = {};
+            spyOn(create, 'createProject').and.returnValue(Promise.resolve());
+
+            return Api.createPlatform(testDir, null, testOpts, new EventEmitter()).then(api => {
+                expect(api).toBeInstanceOf(Api);
+                expect(create.createProject).toHaveBeenCalledWith(
+                    testDir, jasmine.any(String), jasmine.any(String), testOpts
+                );
+            });
+        });
+    });
 });
 
 describe('project level Api', function () {
