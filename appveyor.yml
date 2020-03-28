@@ -16,16 +16,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
-
 # appveyor file
 # http://www.appveyor.com/docs/appveyor-yml
 
 environment:
   matrix:
-  - nodejs_version: 6
-  - nodejs_version: 8
-  - nodejs_version: 10
-  - nodejs_version: 12
+    - nodejs_version: "10"
+    - nodejs_version: "12"
 
 install:
   - ps: Install-Product node $env:nodejs_version
