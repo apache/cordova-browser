@@ -17,50 +17,38 @@
  under the License.
  */
 
-var shell = require('shelljs');
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
-var util = require('util');
+const { superspawn } = require('cordova-common');
 
 var cordova_bin = path.join(__dirname, '../bin');// is this the same on all platforms?
-var tmpDir = path.join(__dirname, '../temp');
 var createScriptPath = path.join(cordova_bin, 'create');
+const tmp = require('tmp').dirSync().name;
 
 function createAndBuild (projectname, projectid) {
+    const projectTempDir = path.join(`${tmp}/${projectname}`);
+    const createBin = path.join(`${cordova_bin}/create`);
+    const buildBin = path.join(`${projectTempDir}/cordova/build`);
 
-    var return_code = 0;
-    var command;
+    // Remove any pre-existing temp projects
+    fs.removeSync(projectTempDir);
 
-    // remove existing folder
-    shell.rm('-rf', tmpDir);
-    shell.mkdir(tmpDir);
+    return superspawn.spawn(createBin, [projectTempDir, projectid, projectname], { printCommand: true }).then(
+        () => {
+            expect(true).toBe(true); // It is expected that create is successful
 
-    // create the project
-    command = util.format('"%s" "%s/%s" "%s" "%s"', createScriptPath, tmpDir, projectname, projectid, projectname);
-    // shell.echo(command);
-    return_code = shell.exec(command).code;
-    expect(return_code).toBe(0);
-
-    var tempCordovaScriptsPath = path.join(tmpDir, projectname, 'cordova');
-
-    console.log('tempCordovaScriptsPath = ' + tempCordovaScriptsPath);
-
-    // created project has scripts in the cordova folder
-    // build, clean, log, run, version
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'build'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'clean'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'log'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'run'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'version'))).toBe(true);
-
-    // // build the project
-    command = util.format('"%s/cordova/build"', path.join(tmpDir, projectname));
-    // shell.echo(command);
-    return_code = shell.exec(command, { silent: true }).code;
-    expect(return_code).toBe(0);
-
-    // clean-up
-    shell.rm('-rf', tmpDir);
+            return superspawn.spawn(buildBin, [], { printCommand: true }).then(
+                () => {
+                    expect(true).toBe(true); // It is expected that build is successful
+                },
+                () => fail('Project Build has failed and is not expected.')
+            );
+        },
+        () => fail('Project create has failed and is not expected.')
+    ).finally(() => {
+        // Delete Temp Project
+        fs.removeSync(projectTempDir);
+    });
 }
 
 describe('create', function () {
