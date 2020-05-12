@@ -22,9 +22,8 @@ under the License.
     'cordova platform add PATH' where path is this repo.
 */
 
-var shell = require('shelljs');
 var path = require('path');
-var fs = require('fs');
+var fs = require('fs-extra');
 
 var cdvcmn = require('cordova-common');
 var CordovaLogger = cdvcmn.CordovaLogger;
@@ -132,8 +131,7 @@ Api.prototype.getPlatformInfo = function () {
 Api.prototype.prepare = function (cordovaProject, options) {
 
     // First cleanup current config and merge project's one into own
-    var defaultConfigPath = path.join(this.locations.platformRootDir, 'cordova',
-        'defaults.xml');
+    var defaultConfigPath = path.join(this.locations.platformRootDir, 'cordova', 'defaults.xml');
     var ownConfigPath = this.locations.configXml;
     var sourceCfg = cordovaProject.projectConfig;
 
@@ -142,13 +140,13 @@ Api.prototype.prepare = function (cordovaProject, options) {
     // restored or copy project config into platform if none exists.
     if (fs.existsSync(defaultConfigPath)) {
         this.events.emit('verbose', 'Generating config.xml from defaults for platform "' + this.platform + '"');
-        shell.cp('-f', defaultConfigPath, ownConfigPath);
+        fs.copySync(defaultConfigPath, ownConfigPath);
     } else if (fs.existsSync(ownConfigPath)) {
-        this.events.emit('verbose', 'Generating defaults.xml from own config.xml for platform "' + this.platform + '"');
-        shell.cp('-f', ownConfigPath, defaultConfigPath);
+        this.events.emit('verbose', `Generating defaults.xml from own config.xml for platform "${this.platform}"`);
+        fs.copySync(ownConfigPath, defaultConfigPath);
     } else {
-        this.events.emit('verbose', 'case 3"' + this.platform + '"');
-        shell.cp('-f', sourceCfg.path, ownConfigPath);
+        this.events.emit('verbose', `case 3 "${this.platform}"`);
+        fs.copySync(sourceCfg.path, ownConfigPath);
     }
 
     // merge our configs
@@ -170,7 +168,7 @@ Api.prototype.prepare = function (cordovaProject, options) {
         // just blindly copy it to our output/www
         // todo: validate it? ensure all properties we expect exist?
         this.events.emit('verbose', 'copying ' + srcManifestPath + ' => ' + manifestPath);
-        shell.cp('-f', srcManifestPath, manifestPath);
+        fs.copySync(srcManifestPath, manifestPath);
     } else {
         var manifestJson = {
             'background_color': '#FFF',
@@ -357,7 +355,7 @@ Api.prototype.removePlugin = function (plugin, uninstallOptions) {
             self._removeModulesInfo(plugin, targetDir);
             // Remove stale plugin directory
             // TODO: this should be done by plugin files uninstaller
-            shell.rm('-rf', path.resolve(self.root, 'Plugins', plugin.id));
+            fs.removeSync(path.resolve(self.root, 'Plugins', plugin.id));
         });
 };
 
@@ -474,7 +472,7 @@ Api.prototype._writePluginModules = function (targetDir) {
     final_contents += '// BOTTOM OF METADATA\n';
     final_contents += '});'; // Close cordova.define.
 
-    shell.mkdir('-p', targetDir);
+    fs.ensureDirSync(targetDir);
     fs.writeFileSync(path.join(targetDir, 'cordova_plugins.js'), final_contents, 'utf-8');
 };
 
