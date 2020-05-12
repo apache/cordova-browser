@@ -18,8 +18,7 @@
 */
 
 var create = require('./create');
-var fs = require('fs');
-var shell = require('shelljs');
+var fs = require('fs-extra');
 const { CordovaError } = require('cordova-common');
 
 module.exports.help = function () {
@@ -39,20 +38,8 @@ module.exports.run = function (argv) {
     }
 
     console.log('Removing existing browser platform.');
-    shellfatal(shell.rm, '-rf', projectPath);
+    fs.removeSync(projectPath);
 
     // Create Project returns a resolved promise.
     return create.createProject(projectPath);
 };
-
-function shellfatal (shellFunc) {
-    var slicedArgs = Array.prototype.slice.call(arguments, 1);
-    var returnVal = null;
-    try {
-        shell.config.fatal = true;
-        returnVal = shellFunc.apply(shell, slicedArgs);
-    } finally {
-        shell.config.fatal = false;
-    }
-    return returnVal;
-}
