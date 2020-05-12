@@ -18,8 +18,7 @@
 */
 
 var path = require('path');
-var fs = require('fs');
-var shell = require('shelljs');
+var fs = require('fs-extra');
 var events = require('cordova-common').events;
 
 module.exports = {
@@ -59,7 +58,7 @@ module.exports = {
             scriptContent = 'cordova.define("' + moduleName + '", function(require, exports, module) { ' + scriptContent + '\n});\n';
 
             var moduleDestination = path.resolve(www_dir, 'plugins', plugin_id, jsModule.src);
-            shell.mkdir('-p', path.dirname(moduleDestination));
+            fs.ensureDirSync(path.dirname(moduleDestination));
             fs.writeFileSync(moduleDestination, scriptContent, 'utf-8');
         },
         uninstall: function (jsModule, www_dir, plugin_id) {
@@ -117,19 +116,13 @@ module.exports = {
             var src = path.join(plugin_dir, asset.src);
             var dest = path.join(wwwDest, asset.target);
             var destDir = path.parse(dest).dir;
-            if (destDir !== '' && !fs.existsSync(destDir)) {
-                shell.mkdir('-p', destDir);
-            }
 
-            if (fs.statSync(src).isDirectory()) {
-                shell.cp('-Rf', src + '/*', dest);
-            } else {
-                shell.cp('-f', src, dest);
-            }
+            fs.ensureDirSync(destDir);
+            fs.copySync(src, dest);
         },
         uninstall: function (asset, wwwDest, plugin_id) {
-            shell.rm('-rf', path.join(wwwDest, asset.target));
-            shell.rm('-rf', path.join(wwwDest, 'plugins', plugin_id));
+            fs.removeSync(path.join(wwwDest, asset.target));
+            fs.removeSync(path.join(wwwDest, 'plugins', plugin_id));
         }
     }
 };
