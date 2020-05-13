@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,8 +17,7 @@
  * under the License.
  */
 
-var fs = require('fs');
-var shell = require('shelljs');
+var fs = require('fs-extra');
 var path = require('path');
 var ROOT = path.join(__dirname, '..', '..');
 var events = require('cordova-common').events;
@@ -28,11 +25,8 @@ var check_reqs = require('./check_reqs');
 
 // exported method to create a project, returns a promise that resolves with null
 module.exports.createProject = function (project_path, package_name, project_name) {
-/*
     // create the dest and the standard place for our api to live
     // platforms/platformName/cordova/Api.js
-*/
-
     events.emit('log', 'Creating Cordova project for cordova-browser:');
     events.emit('log', '\tPath: ' + project_path);
     events.emit('log', '\tName: ' + project_name);
@@ -51,35 +45,37 @@ module.exports.createProject = function (project_path, package_name, project_nam
         events.emit('error', 'Please make sure you meet the software requirements in order to build a browser cordova project');
     }
 
+    const platformCordovaDir = path.join(project_path, 'cordova');
+
     // copy template/cordova directory ( recursive )
-    shell.cp('-r', path.join(ROOT, 'bin/template/cordova'), project_path);
+    fs.copySync(path.join(ROOT, 'bin/template/cordova'), platformCordovaDir);
 
     // copy template/www directory ( recursive )
-    shell.cp('-r', path.join(ROOT, 'bin/template/www'), project_path);
+    fs.copySync(path.join(ROOT, 'bin/template/www'), path.join(project_path, 'www'));
 
     // recreate our node_modules structure in the new project
-    let nodeModulesDir = path.join(ROOT, 'node_modules');
-    if (fs.existsSync(nodeModulesDir)) shell.cp('-r', nodeModulesDir, path.join(project_path, 'cordova'));
+    const nodeModulesDir = path.join(ROOT, 'node_modules');
+    if (fs.existsSync(nodeModulesDir)) fs.copySync(nodeModulesDir, path.join(platformCordovaDir, 'node_modules'));
 
     // copy check_reqs file
-    shell.cp(path.join(ROOT, 'bin/lib/check_reqs.js'),
-        path.join(project_path, 'cordova/lib'));
+    fs.copySync(path.join(ROOT, 'bin/lib/check_reqs.js'), path.join(project_path, 'cordova/lib/check_reqs.js'));
 
     var platform_www = path.join(project_path, 'platform_www');
 
     // copy cordova-js-src directory
-    shell.cp('-rf', path.join(ROOT, 'cordova-js-src'), platform_www);
+    fs.copySync(path.join(ROOT, 'cordova-js-src'), path.join(platform_www, 'cordova-js-src'));
 
     // copy cordova js file to platform_www
-    shell.cp(path.join(ROOT, 'cordova-lib', 'cordova.js'), platform_www);
+    fs.copySync(path.join(ROOT, 'cordova-lib/cordova.js'), path.join(platform_www, 'cordova.js'));
 
     // copy favicon file to platform_www
-    shell.cp(path.join(ROOT, 'bin/template/www/favicon.ico'), platform_www);
+    fs.copySync(path.join(ROOT, 'bin/template/www/favicon.ico'), path.join(platform_www, 'favicon.ico'));
 
     // load manifest to write name/shortname
     var manifest = require(path.join(ROOT, 'bin/template/www', 'manifest.json'));
     manifest.name = project_name;
     manifest.short_name = project_name;
+
     // copy manifest file to platform_www
     fs.writeFileSync(path.join(platform_www, 'manifest.json'),
         JSON.stringify(manifest, null, 2), 'utf-8');

@@ -17,9 +17,8 @@
     under the License.
 */
 
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
-var shell = require('shelljs');
 var CordovaError = require('cordova-common').CordovaError;
 var events = require('cordova-common').events;
 var FileUpdater = require('cordova-common').FileUpdater;
@@ -89,17 +88,8 @@ browser_parser.prototype.update_www = function (cordovaProject, opts) {
     FileUpdater.mergeAndUpdateDir(sourceDirs, targetDir, { rootDir: cordovaProject.root }, logFileOp);
 };
 
-browser_parser.prototype.update_overrides = function () {
-    // console.log("update_overrides");
-
-    // TODO: ?
-    // var projectRoot = util.isCordova(this.path);
-    // var mergesPath = path.join(util.appDir(projectRoot), 'merges', 'browser');
-    // if(fs.existsSync(mergesPath)) {
-    //     var overrides = path.join(mergesPath, '*');
-    //     shell.cp('-rf', overrides, this.www_dir());
-    // }
-};
+// @todo ?
+browser_parser.prototype.update_overrides = function () { };
 
 browser_parser.prototype.config_xml = function () {
     return path.join(this.path, 'config.xml');
@@ -114,7 +104,7 @@ browser_parser.prototype.update_project = function (cfg) {
     defer.then(function () {
         self.update_overrides();
         // Copy munged config.xml to platform www dir
-        shell.cp('-rf', path.join(www_dir, '..', 'config.xml'), www_dir);
+        fs.copySync(path.join(www_dir, '..', 'config.xml'), path.join(www_dir, 'config.xml'));
     });
     return defer;
 };

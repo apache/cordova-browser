@@ -18,8 +18,7 @@
 */
 
 var browser_handler = require('../bin/template/cordova/browser_handler');
-var shell = require('shelljs');
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
 
 describe('Asset install tests', function () {
@@ -37,8 +36,8 @@ describe('Asset install tests', function () {
     var plugin_dir = 'pluginDir';
     var wwwDest = 'dest';
 
-    it('if src is a directory, should be called with cp, -Rf', function () {
-        var cp = spyOn(shell, 'cp').and.returnValue('-Rf');
+    it('if src is a directory, should be called with fs.copySync', function () {
+        var cp = spyOn(fs, 'copySync');
         fsstatMock = {
             isDirectory: function () {
                 return true;
@@ -46,11 +45,11 @@ describe('Asset install tests', function () {
         };
         spyOn(fs, 'statSync').and.returnValue(fsstatMock);
         browser_handler.asset.install(asset, plugin_dir, wwwDest);
-        expect(cp).toHaveBeenCalledWith('-Rf', jasmine.any(String), path.join('dest', asset.target));
+        expect(cp).toHaveBeenCalledWith(jasmine.any(String), path.join('dest', asset.target));
     });
-    it('if src is not a directory and asset has no path, should be called with cp, -f', function () {
-        var cp = spyOn(shell, 'cp').and.returnValue('-f');
-        var mkdir = spyOn(shell, 'mkdir');
+    it('if src is not a directory and asset has no path, should be called with fs.copySync', function () {
+        var cp = spyOn(fs, 'copySync');
+        var mkdir = spyOn(fs, 'ensureDirSync');
         spyOn(fs, 'existsSync').and.returnValue(true);
         fsstatMock = {
             isDirectory: function () {
@@ -59,15 +58,15 @@ describe('Asset install tests', function () {
         };
         spyOn(fs, 'statSync').and.returnValue(fsstatMock);
         browser_handler.asset.install(asset, plugin_dir, wwwDest);
-        expect(mkdir).not.toHaveBeenCalled();
-        expect(cp).toHaveBeenCalledWith('-f', path.join('pluginDir', asset.src), path.join('dest', asset.target));
+        expect(mkdir).toHaveBeenCalled();
+        expect(cp).toHaveBeenCalledWith(path.join('pluginDir', asset.src), path.join('dest', asset.target));
     });
     it('if src is not a directory and asset has a path, should be called with cp, -f', function () {
         /*
             Test that a dest directory gets created if it does not exist
         */
-        var cp = spyOn(shell, 'cp').and.returnValue('-f');
-        var mkdir = spyOn(shell, 'mkdir');
+        var cp = spyOn(fs, 'copySync');
+        var mkdir = spyOn(fs, 'ensureDirSync');
         fsstatMock = {
             isDirectory: function () {
                 return false;
@@ -76,15 +75,13 @@ describe('Asset install tests', function () {
         spyOn(fs, 'statSync').and.returnValue(fsstatMock);
 
         browser_handler.asset.install(assetWithPath, plugin_dir, wwwDest);
-        expect(mkdir).toHaveBeenCalledWith('-p', path.join('dest', 'js', 'deepdown'));
-        expect(cp).toHaveBeenCalledWith('-f', path.join('pluginDir', assetWithPath.src),
+        expect(mkdir).toHaveBeenCalledWith(path.join('dest', 'js', 'deepdown'));
+        expect(cp).toHaveBeenCalledWith(path.join('pluginDir', assetWithPath.src),
             path.join('dest', assetWithPath.target));
         /*
             Now test that a second call to the same dest folder skips mkdir because the first asset call should have created it.
         */
         spyOn(fs, 'existsSync').and.returnValue(true);
         browser_handler.asset.install(assetWithPath2, plugin_dir, wwwDest);
-        expect(mkdir.calls.count()).toBe(1); // not called again
-
     });
 });

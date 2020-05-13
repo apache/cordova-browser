@@ -19,8 +19,7 @@
  * under the License.
  */
 
-var fs = require('fs');
-var shell = require('shelljs');
+var fs = require('fs-extra');
 var path = require('path');
 var check_reqs = require('./check_reqs');
 var platformBuildDir = path.join('platforms', 'browser', 'www');
@@ -36,7 +35,7 @@ var run = function () {
 
     try {
         if (fs.existsSync(platformBuildDir)) {
-            shell.rm('-r', platformBuildDir);
+            fs.removeSync(platformBuildDir);
         }
     } catch (err) {
         console.log('could not remove ' + platformBuildDir + ' : ' + err.message);
