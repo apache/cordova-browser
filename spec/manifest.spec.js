@@ -17,8 +17,8 @@
  under the License.
  */
 
-var shell = require('shelljs');
-var fs = require('fs');
+var { exec } = require('shelljs');
+var fs = require('fs-extra');
 var path = require('path');
 var util = require('util');
 
@@ -32,13 +32,13 @@ function createAndBuild (projectname, projectid) {
     var command;
 
     // remove existing folder
-    shell.rm('-rf', tmpDir);
-    shell.mkdir(tmpDir);
+    fs.removeSync(tmpDir);
+    fs.ensureDirSync(tmpDir);
 
     // create the project
     command = util.format('"%s" "%s/%s" "%s" "%s"', createScriptPath, tmpDir, projectname, projectid, projectname);
 
-    return_code = shell.exec(command).code;
+    return_code = exec(command).code;
     expect(return_code).toBe(0);
 
     var platWwwPath = path.join(tmpDir, projectname, 'platform_www');
@@ -71,7 +71,7 @@ function createAndBuild (projectname, projectid) {
     // related_applications[{platform:'web'},{platform:'play',url:...}] ?
 
     // clean-up
-    shell.rm('-rf', tmpDir);
+    fs.removeSync(tmpDir);
 }
 
 describe('create', function () {
