@@ -58,7 +58,7 @@ module.exports.createProject = function (project_path, package_name, project_nam
     shell.cp('-r', path.join(ROOT, 'bin/template/www'), project_path);
 
     // recreate our node_modules structure in the new project
-    let nodeModulesDir = path.join(ROOT, 'node_modules');
+    const nodeModulesDir = path.join(ROOT, 'node_modules');
     if (fs.existsSync(nodeModulesDir)) shell.cp('-r', nodeModulesDir, path.join(project_path, 'cordova'));
 
     // copy check_reqs file

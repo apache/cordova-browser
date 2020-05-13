@@ -24,7 +24,6 @@ const Api = require('../bin/template/cordova/Api');
 const create = require('../bin/lib/create');
 
 describe('can get the Api', function () {
-
     it('should be defined', function () {
         expect(Api).toBeDefined();
     });
@@ -57,7 +56,6 @@ describe('can get the Api', function () {
 });
 
 describe('project level Api', function () {
-
     var testApi = new Api();
 
     it('can be created', function () {
@@ -103,7 +101,6 @@ describe('project level Api', function () {
         expect(testApi.getPlatformInfo).toBeDefined();
         expect(typeof testApi.getPlatformInfo).toBe('function');
     });
-
 });
 
 // Static methods

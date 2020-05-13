@@ -26,7 +26,6 @@ var check_reqs = require('./check_reqs');
 var platformBuildDir = path.join('platforms', 'browser', 'www');
 
 var run = function () {
-
     // TODO: everything calls check_reqs ... why?
     // Check that requirements are (still) met
     if (!check_reqs.run()) {
