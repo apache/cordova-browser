@@ -37,25 +37,8 @@ function browser_parser (project) {
 
 module.exports = browser_parser;
 
-// Returns a promise.
-browser_parser.prototype.update_from_config = function () {
-    return Promise.resolve();
-};
-
 browser_parser.prototype.www_dir = function () {
     return path.join(this.path, 'www');
-};
-
-// Used for creating platform_www in projects created by older versions.
-browser_parser.prototype.cordovajs_path = function (libDir) {
-    const jsPath = path.join(libDir, 'cordova-lib', 'cordova.js');
-    return path.resolve(jsPath);
-};
-
-browser_parser.prototype.cordovajs_src_path = function (libDir) {
-    // console.log("cordovajs_src_path");
-    const jsPath = path.join(libDir, 'cordova-js-src');
-    return path.resolve(jsPath);
 };
 
 /**
@@ -89,32 +72,11 @@ browser_parser.prototype.update_www = function (cordovaProject, opts) {
     FileUpdater.mergeAndUpdateDir(sourceDirs, targetDir, { rootDir: cordovaProject.root }, logFileOp);
 };
 
-browser_parser.prototype.update_overrides = function () {
-    // console.log("update_overrides");
-
-    // TODO: ?
-    // var projectRoot = util.isCordova(this.path);
-    // var mergesPath = path.join(util.appDir(projectRoot), 'merges', 'browser');
-    // if(fs.existsSync(mergesPath)) {
-    //     var overrides = path.join(mergesPath, '*');
-    //     shell.cp('-rf', overrides, this.www_dir());
-    // }
-};
-
 browser_parser.prototype.config_xml = function () {
     return path.join(this.path, 'config.xml');
 };
 
-// Returns a promise.
-browser_parser.prototype.update_project = function (cfg) {
-    // console.log("update_project ",cfg);
-    const defer = this.update_from_config();
-    const self = this;
-    const www_dir = self.www_dir();
-    defer.then(function () {
-        self.update_overrides();
-        // Copy munged config.xml to platform www dir
-        shell.cp('-rf', path.join(www_dir, '..', 'config.xml'), www_dir);
-    });
-    return defer;
+browser_parser.prototype.update_project = async function (cfg) {
+    // Copy munged config.xml to platform www dir
+    shell.cp('-rf', this.config_xml(), this.www_dir());
 };
