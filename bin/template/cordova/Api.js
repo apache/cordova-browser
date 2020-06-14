@@ -35,8 +35,9 @@ var xmlHelpers = cdvcmn.xmlHelpers;
 var PlatformJson = cdvcmn.PlatformJson;
 var PlatformMunger = cdvcmn.ConfigChanges.PlatformMunger;
 var PluginInfoProvider = cdvcmn.PluginInfoProvider;
+var CordovaError = cdvcmn.CordovaError;
+var FileUpdater = cdvcmn.FileUpdater;
 
-var BrowserParser = require('./browser_parser');
 var PLATFORM_NAME = 'browser';
 
 function setupEvents (externalEventEmitter) {
@@ -52,6 +53,17 @@ function setupEvents (externalEventEmitter) {
     return selfEvents;
 }
 
+/**
+ * Logs all file operations via the verbose event stream, indented.
+ */
+function logFileOp (message) {
+    selfEvents.emit('verbose', '  ' + message);
+}
+
+function dirExists (dir) {
+    return fs.existsSync(dir) && fs.statSync(dir).isDirectory();
+}
+
 function Api (platform, platformRootDir, events) {
 
     this.platform = platform || PLATFORM_NAME;
@@ -59,7 +71,9 @@ function Api (platform, platformRootDir, events) {
     // MyApp/platforms/browser
     this.root = path.resolve(__dirname, '..');
     this.events = setupEvents(events);
-    this.parser = new BrowserParser(this.root);
+    if (!dirExists(this.root) || !dirExists(path.join(this.root, 'cordova'))) {
+        throw new CordovaError('The provided path "' + this.root + '" is not a valid browser project.');
+    }
     this._handler = require('./browser_handler');
 
     this.locations = {
@@ -129,7 +143,7 @@ Api.prototype.getPlatformInfo = function () {
     };
 };
 
-Api.prototype.prepare = function (cordovaProject, options) {
+Api.prototype.prepare = async function (cordovaProject, options) {
 
     // First cleanup current config and merge project's one into own
     var defaultConfigPath = path.join(this.locations.platformRootDir, 'cordova',
@@ -159,7 +173,7 @@ Api.prototype.prepare = function (cordovaProject, options) {
     this.config.write();
 
     // Update own www dir with project's www assets and plugins' assets and js-files
-    this.parser.update_www(cordovaProject, options);
+    this._updateWww(cordovaProject);
 
     // Copy or Create manifest.json
     // todo: move this to a manifest helper module
@@ -255,8 +269,30 @@ Api.prototype.prepare = function (cordovaProject, options) {
         fs.writeFileSync(manifestPath, JSON.stringify(manifestJson, null, 2), 'utf8');
     }
 
-    // update project according to config.xml changes.
-    return this.parser.update_project(this.config, options);
+    // Copy munged config.xml to platform www dir
+    shell.cp('-rf', this.locations.configXml, this.locations.www);
+};
+
+// Replace the www dir with contents of platform_www and app www.
+Api.prototype._updateWww = function (cordovaProject) {
+    // add cordova www and platform_www to sourceDirs
+    var sourceDirs = [
+        path.relative(cordovaProject.root, cordovaProject.locations.www),
+        path.relative(cordovaProject.root, this.locations.platformWww)
+    ];
+
+    // If project contains 'merges' for our platform, use them as another overrides
+    var merges_path = path.join(cordovaProject.root, 'merges', 'browser');
+    if (fs.existsSync(merges_path)) {
+        selfEvents.emit('verbose', 'Found "merges/browser" folder. Copying its contents into the browser project.');
+        // add merges/browser to sourceDirs
+        sourceDirs.push(path.join('merges', 'browser'));
+    }
+
+    // targetDir points to browser/www
+    var targetDir = path.relative(cordovaProject.root, this.locations.www);
+    selfEvents.emit('verbose', 'Merging and updating files from [' + sourceDirs.join(', ') + '] to ' + targetDir);
+    FileUpdater.mergeAndUpdateDir(sourceDirs, targetDir, { rootDir: cordovaProject.root }, logFileOp);
 };
 
 Api.prototype.addPlugin = function (pluginInfo, installOptions) {
