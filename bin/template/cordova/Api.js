@@ -53,7 +53,6 @@ function setupEvents (externalEventEmitter) {
 }
 
 function Api (platform, platformRootDir, events) {
-
     this.platform = platform || PLATFORM_NAME;
 
     // MyApp/platforms/browser
@@ -82,7 +81,6 @@ function Api (platform, platformRootDir, events) {
 }
 
 Api.createPlatform = function (dest, config, options, events) {
-
     var creator = require('../../lib/create');
     events = setupEvents(events);
 
@@ -121,16 +119,15 @@ Api.prototype.getPlatformInfo = function () {
     // console.log("browser-platform:Api:getPlatformInfo");
     // return PlatformInfo object
     return {
-        'locations': this.locations,
-        'root': this.root,
-        'name': this.platform,
-        'version': { 'version': '1.0.0' }, // um, todo!
-        'projectConfig': this.config
+        locations: this.locations,
+        root: this.root,
+        name: this.platform,
+        version: { version: '1.0.0' }, // um, todo!
+        projectConfig: this.config
     };
 };
 
 Api.prototype.prepare = function (cordovaProject, options) {
-
     // First cleanup current config and merge project's one into own
     var defaultConfigPath = path.join(this.locations.platformRootDir, 'cordova',
         'defaults.xml');
@@ -173,8 +170,8 @@ Api.prototype.prepare = function (cordovaProject, options) {
         shell.cp('-f', srcManifestPath, manifestPath);
     } else {
         var manifestJson = {
-            'background_color': '#FFF',
-            'display': 'standalone'
+            background_color: '#FFF',
+            display: 'standalone'
         };
         if (this.config) {
             if (this.config.name()) {
@@ -211,9 +208,11 @@ Api.prototype.prepare = function (cordovaProject, options) {
                     "sizes": "128x128"
                 } ******/
                 // ?Is it worth looking at file extentions?
-                return { 'src': icon.src,
-                    'type': 'image/png',
-                    'sizes': (icon.width + 'x' + icon.height) };
+                return {
+                    src: icon.src,
+                    type: 'image/png',
+                    sizes: (icon.width + 'x' + icon.height)
+                };
             });
             manifestJson.icons = manifestIcons;
 
@@ -230,7 +229,7 @@ Api.prototype.prepare = function (cordovaProject, options) {
             }
 
             // get start_url
-            var contentNode = this.config.doc.find('content') || { 'attrib': { 'src': 'index.html' } }; // sensible default
+            var contentNode = this.config.doc.find('content') || { attrib: { src: 'index.html' } }; // sensible default
             manifestJson.start_url = contentNode.attrib.src;
 
             // now we get some values from start_url page ...
@@ -260,7 +259,6 @@ Api.prototype.prepare = function (cordovaProject, options) {
 };
 
 Api.prototype.addPlugin = function (pluginInfo, installOptions) {
-
     // console.log(new Error().stack);
     if (!pluginInfo) {
         return Promise.reject(new Error('The parameter is incorrect. The first parameter ' +
@@ -307,9 +305,9 @@ Api.prototype.addPlugin = function (pluginInfo, installOptions) {
                 .add_plugin_changes(pluginInfo, installOptions.variables, /* is_top_level= */true, /* should_increment= */true)
                 .save_all();
 
-            var targetDir = installOptions.usePlatformWww ?
-                self.getPlatformInfo().locations.platformWww :
-                self.getPlatformInfo().locations.www;
+            var targetDir = installOptions.usePlatformWww
+                ? self.getPlatformInfo().locations.platformWww
+                : self.getPlatformInfo().locations.www;
 
             self._addModulesInfo(pluginInfo, targetDir);
         });
@@ -350,9 +348,9 @@ Api.prototype.removePlugin = function (plugin, uninstallOptions) {
                 .remove_plugin_changes(plugin, /* is_top_level= */true)
                 .save_all();
 
-            var targetDir = uninstallOptions.usePlatformWww ?
-                self.getPlatformInfo().locations.platformWww :
-                self.getPlatformInfo().locations.www;
+            var targetDir = uninstallOptions.usePlatformWww
+                ? self.getPlatformInfo().locations.platformWww
+                : self.getPlatformInfo().locations.www;
 
             self._removeModulesInfo(plugin, targetDir);
             // Remove stale plugin directory
@@ -368,11 +366,10 @@ Api.prototype._getInstaller = function (type) {
 
         if (!installer) {
             console.log('unrecognized type ' + type);
-
         } else {
-            var wwwDest = options.usePlatformWww ?
-                self.getPlatformInfo().locations.platformWww :
-                self._handler.www_dir(self.root);
+            var wwwDest = options.usePlatformWww
+                ? self.getPlatformInfo().locations.platformWww
+                : self._handler.www_dir(self.root);
 
             if (type === 'asset') {
                 installer.install(item, plugin_dir, wwwDest);
@@ -392,18 +389,16 @@ Api.prototype._getUninstaller = function (type) {
 
         if (!installer) {
             console.log('browser plugin uninstall: unrecognized type, skipping : ' + type);
-
         } else {
-            var wwwDest = options.usePlatformWww ?
-                self.getPlatformInfo().locations.platformWww :
-                self._handler.www_dir(self.root);
+            var wwwDest = options.usePlatformWww
+                ? self.getPlatformInfo().locations.platformWww
+                : self._handler.www_dir(self.root);
 
             if (['asset', 'js-module'].indexOf(type) > -1) {
                 return installer.uninstall(item, wwwDest, plugin_id);
             } else {
                 return installer.uninstall(item, self.root, plugin_id, options, project);
             }
-
         }
     };
 };

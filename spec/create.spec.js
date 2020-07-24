@@ -27,7 +27,6 @@ var tmpDir = path.join(__dirname, '../temp');
 var createScriptPath = path.join(cordova_bin, 'create');
 
 function createAndBuild (projectname, projectid) {
-
     var return_code = 0;
     var command;
 
@@ -64,7 +63,6 @@ function createAndBuild (projectname, projectid) {
 }
 
 describe('create', function () {
-
     it('has a create script in bin/cordova', function () {
         expect(fs.existsSync(createScriptPath)).toBe(true);
     });
@@ -110,5 +108,4 @@ describe('create', function () {
 
         createAndBuild(projectname, projectid);
     });
-
 });

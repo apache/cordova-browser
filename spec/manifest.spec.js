@@ -27,7 +27,6 @@ var tmpDir = path.join(__dirname, '../temp');
 var createScriptPath = path.join(cordova_bin, 'create');
 
 function createAndBuild (projectname, projectid) {
-
     var return_code = 0;
     var command;
 
@@ -75,7 +74,6 @@ function createAndBuild (projectname, projectid) {
 }
 
 describe('create', function () {
-
     it('create project with manifest.json', function () {
         var projectname = 'testcreate';
         var projectid = 'com.test.app1';

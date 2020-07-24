@@ -27,7 +27,7 @@ var args = process.argv;
 start(args);
 
 function start (argv) {
-    var args = nopt({ 'help': Boolean, 'target': String, 'port': Number }, { 'help': ['/?', '-h', 'help', '-help', '/help'] }, argv);
+    var args = nopt({ help: Boolean, target: String, port: Number }, { help: ['/?', '-h', 'help', '-help', '/help'] }, argv);
     if (args.help) {
         help();
     } else {
