@@ -30,20 +30,6 @@
     "tmp": "0.0.33"
   },
   "author": "Apache Software Foundation",
-  "contributors": [
-    {
-      "name": "Steve Gill",
-      "email": "steveng@adobe.com"
-    },
-    {
-      "name": "Suraj Pindoria",
-      "email": "spindori@adobe.com"
-    },
-    {
-      "name": "Jesse MacFadyen",
-      "email": "purplecabbage@apache.org"
-    }
-  ],
   "license": "Apache-2.0",
   "engines": {
     "node": ">=10.0.0"
