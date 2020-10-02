@@ -4,10 +4,7 @@
   "description": "cordova-browser release",
   "main": "bin/template/cordova/Api.js",
   "bin": "bin/create",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/apache/cordova-browser"
-  },
+  "repository": "github:apache/cordova-browser",
   "bugs": {
     "url": "https://github.com/apache/cordova-browser/issues"
   },
