@@ -5,9 +5,7 @@
   "main": "bin/template/cordova/Api.js",
   "bin": "bin/create",
   "repository": "github:apache/cordova-browser",
-  "bugs": {
-    "url": "https://github.com/apache/cordova-browser/issues"
-  },
+  "bugs": "https://github.com/apache/cordova-browser/issues",
   "keywords": [
     "cordova",
     "browser",
