@@ -18,9 +18,8 @@
 # under the License.
 #
 -->
-
-[![Build status](https://travis-ci.org/apache/cordova-browser.svg?branch=master )](https://travis-ci.org/apache/cordova-browser.svg?branch=master )
-[![Build Status](https://ci.appveyor.com/api/projects/status/4oan2jjn7nlgfay3/branch/master?svg=true)](https://ci.appveyor.com/api/projects/status/4oan2jjn7nlgfay3/branch/master?svg=true)
+[![Node CI](https://github.com/apache/cordova-browser/workflows/Node%20CI/badge.svg?branch=master)](https://github.com/apache/cordova-browser/actions?query=branch%3Amaster)
+[![codecov.io](https://codecov.io/github/apache/cordova-browser/coverage.svg?branch=master)](https://codecov.io/github/apache/cordova-browser?branch=master)
 
 # Cordova Browser
 
