@@ -67,10 +67,9 @@ module.exports.createProject = function (project_path, package_name, project_nam
     shell.cp(path.join(ROOT, 'bin/lib/check_reqs.js'),
         path.join(project_path, 'cordova/lib'));
 
+    // create platform_www dir if it does not exist yet
     var platform_www = path.join(project_path, 'platform_www');
-
-    // copy cordova-js-src directory
-    shell.cp('-rf', path.join(ROOT, 'cordova-js-src'), platform_www);
+    shell.mkdir('-p', platform_www);
 
     // copy cordova js file to platform_www
     shell.cp(path.join(ROOT, 'cordova-lib', 'cordova.js'), platform_www);
