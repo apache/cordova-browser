@@ -43,6 +43,8 @@ module.exports.createProject = function (project_path, package_name, project_nam
     // Check if project already exists
     if (fs.existsSync(project_path)) {
         events.emit('error', 'Oops, destination already exists! Delete it and try again');
+    } else {
+        fs.mkdirSync(project_path);
     }
 
     // Check that requirements are met and proper targets are installed
