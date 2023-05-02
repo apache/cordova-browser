@@ -56,7 +56,7 @@ describe('can get the Api', function () {
 });
 
 describe('project level Api', function () {
-    var testApi = new Api();
+    const testApi = new Api();
 
     it('can be created', function () {
         expect(testApi).toBeDefined();

@@ -17,9 +17,9 @@
        under the License.
 */
 
-var create = require('./create');
-var fs = require('fs');
-var shell = require('shelljs');
+const create = require('./create');
+const fs = require('fs');
+const shell = require('shelljs');
 const { CordovaError } = require('cordova-common');
 
 module.exports.help = function () {
@@ -31,7 +31,7 @@ module.exports.help = function () {
 };
 
 module.exports.run = function (argv) {
-    var projectPath = argv[2];
+    const projectPath = argv[2];
 
     // If the specified project path is not valid then reject promise.
     if (!fs.existsSync(projectPath)) {
@@ -46,8 +46,8 @@ module.exports.run = function (argv) {
 };
 
 function shellfatal (shellFunc) {
-    var slicedArgs = Array.prototype.slice.call(arguments, 1);
-    var returnVal = null;
+    const slicedArgs = Array.prototype.slice.call(arguments, 1);
+    let returnVal = null;
     try {
         shell.config.fatal = true;
         returnVal = shellFunc.apply(shell, slicedArgs);

@@ -24,8 +24,8 @@ module.exports = {
     cordovaVersion: '4.2.0', // cordova-js
 
     bootstrap: function () {
-        var modulemapper = require('cordova/modulemapper');
-        var channel = require('cordova/channel');
+        const modulemapper = require('cordova/modulemapper');
+        const channel = require('cordova/channel');
 
         modulemapper.clobbers('cordova/exec/proxy', 'cordova.commandProxy');
 

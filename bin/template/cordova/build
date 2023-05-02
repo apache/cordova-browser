@@ -19,8 +19,8 @@
        under the License.
 */
 
-var build = require('./lib/build');
-var args = process.argv;
+const build = require('./lib/build');
+const args = process.argv;
 
 // provide help
 const helpOptions = '--help /? -h /h help -help /help'.split(' ');
