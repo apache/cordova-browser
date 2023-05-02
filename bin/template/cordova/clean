@@ -19,9 +19,9 @@
        under the License.
 */
 
-var path = require('path');
-var clean = require('./lib/clean');
-var args = process.argv;
+const path = require('path');
+const clean = require('./lib/clean');
+const args = process.argv;
 
 // Support basic help commands
 const helpOptions = '--help /? -h /h help -help /help'.split(' ');

@@ -19,10 +19,10 @@
  * under the License.
  */
 
-var fs = require('fs');
-var path = require('path');
-var url = require('url');
-var cordovaServe = require('cordova-serve');
+const fs = require('fs');
+const path = require('path');
+const url = require('url');
+const cordovaServe = require('cordova-serve');
 
 module.exports.run = function (args) {
     // defaults
@@ -30,22 +30,22 @@ module.exports.run = function (args) {
     args.target = args.target || 'default'; // make default the system browser
     args.noLogOutput = args.silent || false;
 
-    var wwwPath = path.join(__dirname, '../../www');
-    var manifestFilePath = path.resolve(path.join(wwwPath, 'manifest.json'));
+    const wwwPath = path.join(__dirname, '../../www');
+    const manifestFilePath = path.resolve(path.join(wwwPath, 'manifest.json'));
 
-    var startPage;
+    let startPage;
 
     // get start page from manifest
     if (fs.existsSync(manifestFilePath)) {
         try {
-            var manifest = require(manifestFilePath);
+            const manifest = require(manifestFilePath);
             startPage = manifest.start_url;
         } catch (err) {
             console.log('failed to require manifest ... ' + err);
         }
     }
 
-    var server = cordovaServe();
+    const server = cordovaServe();
     server.servePlatform('browser', { port: args.port, noServerInfo: true, noLogOutput: args.noLogOutput })
         .then(function () {
             if (!startPage) {
@@ -53,7 +53,7 @@ module.exports.run = function (args) {
                 startPage = 'index.html';
             }
 
-            var projectUrl = (new url.URL(`http://localhost:${server.port}/${startPage}`)).href;
+            const projectUrl = (new url.URL(`http://localhost:${server.port}/${startPage}`)).href;
 
             console.log('startPage = ' + startPage);
             console.log('Static file server running @ ' + projectUrl + '\nCTRL + C to shut down');

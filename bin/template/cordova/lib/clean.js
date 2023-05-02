@@ -19,13 +19,13 @@
  * under the License.
  */
 
-var fs = require('fs');
-var shell = require('shelljs');
-var path = require('path');
-var check_reqs = require('./check_reqs');
-var platformBuildDir = path.join('platforms', 'browser', 'www');
+const fs = require('fs');
+const shell = require('shelljs');
+const path = require('path');
+const check_reqs = require('./check_reqs');
+const platformBuildDir = path.join('platforms', 'browser', 'www');
 
-var run = function () {
+const run = function () {
     // TODO: everything calls check_reqs ... why?
     // Check that requirements are (still) met
     if (!check_reqs.run()) {

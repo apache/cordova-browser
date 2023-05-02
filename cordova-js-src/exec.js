@@ -22,8 +22,8 @@
 /* jslint sloppy:true, plusplus:true */
 /* global require, module, console */
 
-var cordova = require('cordova');
-var execProxy = require('cordova/exec/proxy');
+const cordova = require('cordova');
+const execProxy = require('cordova/exec/proxy');
 
 /**
  * Execute a cordova command.  It is up to the native side whether this action
@@ -40,22 +40,22 @@ var execProxy = require('cordova/exec/proxy');
  * @param {String[]} [args]     Zero or more arguments to pass to the method
  */
 module.exports = function (success, fail, service, action, args) {
-    var proxy = execProxy.get(service, action);
+    const proxy = execProxy.get(service, action);
 
     args = args || [];
 
     if (proxy) {
-        var callbackId = service + cordova.callbackId++;
+        const callbackId = service + cordova.callbackId++;
 
         if (typeof success === 'function' || typeof fail === 'function') {
-            cordova.callbacks[callbackId] = { success: success, fail: fail };
+            cordova.callbacks[callbackId] = { success, fail };
         }
         try {
             // callbackOptions param represents additional optional parameters command could pass back, like keepCallback or
             // custom callbackId, for example {callbackId: id, keepCallback: true, status: cordova.callbackStatus.JSON_EXCEPTION }
-            var onSuccess = function (result, callbackOptions) {
+            const onSuccess = function (result, callbackOptions) {
                 callbackOptions = callbackOptions || {};
-                var callbackStatus;
+                let callbackStatus;
                 // covering both undefined and null.
                 // strict null comparison was causing callbackStatus to be undefined
                 // and then no callback was called because of the check in cordova.callbackFromNative
@@ -72,9 +72,9 @@ module.exports = function (success, fail, service, action, args) {
                         keepCallback: callbackOptions.keepCallback || false
                     });
             };
-            var onError = function (err, callbackOptions) {
+            const onError = function (err, callbackOptions) {
                 callbackOptions = callbackOptions || {};
-                var callbackStatus;
+                let callbackStatus;
                 // covering both undefined and null.
                 // strict null comparison was causing callbackStatus to be undefined
                 // and then no callback was called because of the check in cordova.callbackFromNative

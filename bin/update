@@ -18,7 +18,7 @@
        specific language governing permissions and limitations
        under the License.
 */
-var update = require('./lib/update');
+const update = require('./lib/update');
 
 // check for help flag
 if (['--help', '/?', '-h', 'help', '-help', '/help'].indexOf(process.argv[2]) > -1) {

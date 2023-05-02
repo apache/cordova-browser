@@ -17,18 +17,18 @@
  under the License.
  */
 
-var shell = require('shelljs');
-var fs = require('fs');
-var path = require('path');
-var util = require('util');
+const shell = require('shelljs');
+const fs = require('fs');
+const path = require('path');
+const util = require('util');
 
-var cordova_bin = path.join(__dirname, '../bin');// is this the same on all platforms?
-var tmpDir = path.join(__dirname, '../temp');
-var createScriptPath = path.join(cordova_bin, 'create');
+const cordova_bin = path.join(__dirname, '../bin');// is this the same on all platforms?
+const tmpDir = path.join(__dirname, '../temp');
+const createScriptPath = path.join(cordova_bin, 'create');
 
 function createAndBuild (projectname, projectid) {
-    var return_code = 0;
-    var command;
+    let return_code = 0;
+    let command;
 
     // remove existing folder
     shell.rm('-rf', tmpDir);
@@ -40,7 +40,7 @@ function createAndBuild (projectname, projectid) {
     return_code = shell.exec(command).code;
     expect(return_code).toBe(0);
 
-    var tempCordovaScriptsPath = path.join(tmpDir, projectname, 'cordova');
+    const tempCordovaScriptsPath = path.join(tmpDir, projectname, 'cordova');
 
     console.log('tempCordovaScriptsPath = ' + tempCordovaScriptsPath);
 
@@ -68,43 +68,43 @@ describe('create', function () {
     });
 
     it('create project with ascii name, no spaces', function () {
-        var projectname = 'testcreate';
-        var projectid = 'com.test.app1';
+        const projectname = 'testcreate';
+        const projectid = 'com.test.app1';
 
         createAndBuild(projectname, projectid);
     });
 
     it('create project with ascii name, and spaces', function () {
-        var projectname = 'test create';
-        var projectid = 'com.test.app2';
+        const projectname = 'test create';
+        const projectid = 'com.test.app2';
 
         createAndBuild(projectname, projectid);
     });
 
     it('create project with unicode name, no spaces', function () {
-        var projectname = '応応応応用用用用';
-        var projectid = 'com.test.app3';
+        const projectname = '応応応応用用用用';
+        const projectid = 'com.test.app3';
 
         createAndBuild(projectname, projectid);
     });
 
     it('create project with unicode name, and spaces', function () {
-        var projectname = '応応応応 用用用用';
-        var projectid = 'com.test.app4';
+        const projectname = '応応応応 用用用用';
+        const projectid = 'com.test.app4';
 
         createAndBuild(projectname, projectid);
     });
 
     it('create project with ascii+unicode name, no spaces', function () {
-        var projectname = '応応応応hello用用用用';
-        var projectid = 'com.test.app5';
+        const projectname = '応応応応hello用用用用';
+        const projectid = 'com.test.app5';
 
         createAndBuild(projectname, projectid);
     });
 
     it('create project with ascii+unicode name, and spaces', function () {
-        var projectname = '応応応応 hello 用用用用';
-        var projectid = 'com.test.app6';
+        const projectname = '応応応応 hello 用用用用';
+        const projectid = 'com.test.app6';
 
         createAndBuild(projectname, projectid);
     });

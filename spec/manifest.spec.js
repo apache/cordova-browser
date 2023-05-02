@@ -17,35 +17,34 @@
  under the License.
  */
 
-var shell = require('shelljs');
-var fs = require('fs');
-var path = require('path');
-var util = require('util');
+const shell = require('shelljs');
+const fs = require('fs');
+const path = require('path');
+const util = require('util');
 
-var cordova_bin = path.join(__dirname, '../bin');// is this the same on all platforms?
-var tmpDir = path.join(__dirname, '../temp');
-var createScriptPath = path.join(cordova_bin, 'create');
+const cordova_bin = path.join(__dirname, '../bin');// is this the same on all platforms?
+const tmpDir = path.join(__dirname, '../temp');
+const createScriptPath = path.join(cordova_bin, 'create');
 
 function createAndBuild (projectname, projectid) {
-    var return_code = 0;
-    var command;
+    let return_code = 0;
 
     // remove existing folder
     shell.rm('-rf', tmpDir);
     shell.mkdir(tmpDir);
 
     // create the project
-    command = util.format('"%s" "%s/%s" "%s" "%s"', createScriptPath, tmpDir, projectname, projectid, projectname);
+    const command = util.format('"%s" "%s/%s" "%s" "%s"', createScriptPath, tmpDir, projectname, projectid, projectname);
 
     return_code = shell.exec(command).code;
     expect(return_code).toBe(0);
 
-    var platWwwPath = path.join(tmpDir, projectname, 'platform_www');
+    const platWwwPath = path.join(tmpDir, projectname, 'platform_www');
 
-    var manifestPath = path.join(platWwwPath, 'manifest.json');
+    const manifestPath = path.join(platWwwPath, 'manifest.json');
     expect(fs.existsSync(manifestPath)).toBe(true);
 
-    var manifestObj = require(manifestPath);
+    const manifestObj = require(manifestPath);
     expect(manifestObj.name).toBe(projectname);
     // start_url
     expect(manifestObj.start_url).toBe('index.html');
@@ -75,8 +74,8 @@ function createAndBuild (projectname, projectid) {
 
 describe('create', function () {
     it('create project with manifest.json', function () {
-        var projectname = 'testcreate';
-        var projectid = 'com.test.app1';
+        const projectname = 'testcreate';
+        const projectid = 'com.test.app1';
 
         createAndBuild(projectname, projectid);
     });

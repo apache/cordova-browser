@@ -19,15 +19,15 @@
        under the License.
 */
 
-var nopt = require('nopt');
-var runForrest = require('./lib/run');
+const nopt = require('nopt');
+const runForrest = require('./lib/run');
 
-var args = process.argv;
+const args = process.argv;
 
 start(args);
 
 function start (argv) {
-    var args = nopt({ help: Boolean, target: String, port: Number }, { help: ['/?', '-h', 'help', '-help', '/help'] }, argv);
+    const args = nopt({ help: Boolean, target: String, port: Number }, { help: ['/?', '-h', 'help', '-help', '/help'] }, argv);
     if (args.help) {
         help();
     } else {

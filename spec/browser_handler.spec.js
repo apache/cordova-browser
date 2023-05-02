@@ -17,34 +17,34 @@
     under the License.
 */
 
-var browser_handler = require('../bin/template/cordova/browser_handler');
-var shell = require('shelljs');
-var fs = require('fs');
-var path = require('path');
+const browser_handler = require('../bin/template/cordova/browser_handler');
+const shell = require('shelljs');
+const fs = require('fs');
+const path = require('path');
 
 describe('Asset install tests', function () {
-    var fsstatMock;
-    var asset = {
+    let fsstatMock;
+    const asset = {
         itemType: 'asset',
         src: path.join('someSrc', 'ServiceWorker.js'),
         target: 'ServiceWorker.js'
     };
-    var assetWithPath = {
+    const assetWithPath = {
         itemType: 'asset',
         src: path.join('someSrc', 'reformat.js'),
         target: path.join('js', 'deepdown', 'reformat.js')
     };
-    var assetWithPath2 = {
+    const assetWithPath2 = {
         itemType: 'asset',
         src: path.join('someSrc', 'reformat.js'),
         target: path.join('js', 'deepdown', 'reformat2.js')
     };
 
-    var plugin_dir = 'pluginDir';
-    var wwwDest = 'dest';
+    const plugin_dir = 'pluginDir';
+    const wwwDest = 'dest';
 
     it('if src is a directory, should be called with cp, -Rf', function () {
-        var cp = spyOn(shell, 'cp').and.returnValue('-Rf');
+        const cp = spyOn(shell, 'cp').and.returnValue('-Rf');
         fsstatMock = {
             isDirectory: function () {
                 return true;
@@ -55,8 +55,8 @@ describe('Asset install tests', function () {
         expect(cp).toHaveBeenCalledWith('-Rf', jasmine.any(String), path.join('dest', asset.target));
     });
     it('if src is not a directory and asset has no path, should be called with cp, -f', function () {
-        var cp = spyOn(shell, 'cp').and.returnValue('-f');
-        var mkdir = spyOn(shell, 'mkdir');
+        const cp = spyOn(shell, 'cp').and.returnValue('-f');
+        const mkdir = spyOn(shell, 'mkdir');
         spyOn(fs, 'existsSync').and.returnValue(true);
         fsstatMock = {
             isDirectory: function () {
@@ -72,8 +72,8 @@ describe('Asset install tests', function () {
         /*
             Test that a dest directory gets created if it does not exist
         */
-        var cp = spyOn(shell, 'cp').and.returnValue('-f');
-        var mkdir = spyOn(shell, 'mkdir');
+        const cp = spyOn(shell, 'cp').and.returnValue('-f');
+        const mkdir = spyOn(shell, 'mkdir');
         fsstatMock = {
             isDirectory: function () {
                 return false;

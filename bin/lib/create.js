@@ -19,12 +19,12 @@
  * under the License.
  */
 
-var fs = require('fs');
-var shell = require('shelljs');
-var path = require('path');
-var ROOT = path.join(__dirname, '..', '..');
-var events = require('cordova-common').events;
-var check_reqs = require('./check_reqs');
+const fs = require('fs');
+const shell = require('shelljs');
+const path = require('path');
+const ROOT = path.join(__dirname, '..', '..');
+const events = require('cordova-common').events;
+const check_reqs = require('./check_reqs');
 
 // exported method to create a project, returns a promise that resolves with null
 module.exports.createProject = function (project_path, package_name, project_name) {
@@ -67,7 +67,7 @@ module.exports.createProject = function (project_path, package_name, project_nam
     shell.cp(path.join(ROOT, 'bin/lib/check_reqs.js'),
         path.join(project_path, 'cordova/lib'));
 
-    var platform_www = path.join(project_path, 'platform_www');
+    const platform_www = path.join(project_path, 'platform_www');
 
     // copy cordova-js-src directory
     shell.cp('-rf', path.join(ROOT, 'cordova-js-src'), platform_www);
@@ -79,7 +79,7 @@ module.exports.createProject = function (project_path, package_name, project_nam
     shell.cp(path.join(ROOT, 'bin/template/www/favicon.ico'), platform_www);
 
     // load manifest to write name/shortname
-    var manifest = require(path.join(ROOT, 'bin/template/www', 'manifest.json'));
+    const manifest = require(path.join(ROOT, 'bin/template/www', 'manifest.json'));
     manifest.name = project_name;
     manifest.short_name = project_name;
     // copy manifest file to platform_www
