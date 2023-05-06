@@ -18,21 +18,21 @@
     "test": "npm run lint && npm run cover"
   },
   "dependencies": {
-    "cordova-common": "^4.0.0",
-    "cordova-serve": "^4.0.0",
-    "nopt": "^4.0.1",
+    "cordova-common": "^5.0.0",
+    "cordova-serve": "^4.0.1",
+    "nopt": "^7.1.0",
     "shelljs": "^0.8.5"
   },
   "devDependencies": {
     "@cordova/eslint-config": "^5.0.0",
-    "jasmine": "^3.3.1",
-    "nyc": "^14.1.1",
-    "tmp": "0.0.33"
+    "jasmine": "^4.6.0",
+    "nyc": "^15.1.0",
+    "tmp": "^0.2.1"
   },
   "author": "Apache Software Foundation",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.13.0"
   },
   "nyc": {
     "include": [
