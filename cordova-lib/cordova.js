@@ -1,5 +1,5 @@
 // Platform: browser
-// d07d9d0989196f1b90fe962ca68f5ceb355c69ec
+// cordova-js rel/6.1.0-10-gc7d3dc05
 /*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -8,9 +8,9 @@
  to you under the Apache License, Version 2.0 (the
  "License"); you may not use this file except in compliance
  with the License.  You may obtain a copy of the License at
- 
+
      http://www.apache.org/licenses/LICENSE-2.0
- 
+
  Unless required by applicable law or agreed to in writing,
  software distributed under the License is distributed on an
  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,9 +19,8 @@
  under the License.
 */
 ;(function() {
-var PLATFORM_VERSION_BUILD_LABEL = '7.0.0-dev';
+var PLATFORM_VERSION_BUILD_LABEL = '7.0.0';
 // file: src/scripts/require.js
-
 var require;
 var define;
 
@@ -51,10 +50,10 @@ var define;
 
     require = function (id) {
         if (!modules[id]) {
-            throw 'module ' + id + ' not found';
+            throw new Error('module ' + id + ' not found');
         } else if (id in inProgressModules) {
             var cycle = requireStack.slice(inProgressModules[id]).join('->') + '->' + id;
-            throw 'Cycle in require graph: ' + cycle;
+            throw new Error('Cycle in require graph: ' + cycle);
         }
         if (modules[id].factory) {
             try {
@@ -70,8 +69,8 @@ var define;
     };
 
     define = function (id, factory) {
-        if (modules[id]) {
-            throw 'module ' + id + ' already defined';
+        if (Object.prototype.hasOwnProperty.call(modules, id)) {
+            throw new Error('module ' + id + ' already defined');
         }
 
         modules[id] = {
@@ -98,7 +97,7 @@ define("cordova", function(require, exports, module) {
 
 // Workaround for Windows 10 in hosted environment case
 // http://www.w3.org/html/wg/drafts/html/master/browsers.html#named-access-on-the-window-object
-if (window.cordova && !(window.cordova instanceof HTMLElement)) { // eslint-disable-line no-undef
+if (window.cordova && !(window.cordova instanceof HTMLElement)) {
     throw new Error('cordova already defined');
 }
 
@@ -163,7 +162,7 @@ function createEvent (type, data) {
     event.initEvent(type, false, false);
     if (data) {
         for (var i in data) {
-            if (data.hasOwnProperty(i)) {
+            if (Object.prototype.hasOwnProperty.call(data, i)) {
                 event[i] = data[i];
             }
         }
@@ -171,15 +170,12 @@ function createEvent (type, data) {
     return event;
 }
 
-/* eslint-disable no-undef */
 var cordova = {
     define: define,
     require: require,
     version: PLATFORM_VERSION_BUILD_LABEL,
     platformVersion: PLATFORM_VERSION_BUILD_LABEL,
     platformId: platform.id,
-
-    /* eslint-enable no-undef */
 
     /**
      * Methods to add/remove your own addEventListener hijacking on document + window.
@@ -199,15 +195,25 @@ var cordova = {
     removeDocumentEventHandler: function (event) {
         delete documentEventHandlers[event];
     },
+
     /**
      * Retrieve original event handlers that were replaced by Cordova
      *
      * @return object
      */
     getOriginalHandlers: function () {
-        return {'document': {'addEventListener': m_document_addEventListener, 'removeEventListener': m_document_removeEventListener},
-            'window': {'addEventListener': m_window_addEventListener, 'removeEventListener': m_window_removeEventListener}};
+        return {
+            document: {
+                addEventListener: m_document_addEventListener,
+                removeEventListener: m_document_removeEventListener
+            },
+            window: {
+                addEventListener: m_window_addEventListener,
+                removeEventListener: m_window_removeEventListener
+            }
+        };
     },
+
     /**
      * Method to fire event from native code
      * bNoDetach is required for events which cause an exception which needs to be caught in native code
@@ -230,6 +236,7 @@ var cordova = {
             document.dispatchEvent(evt);
         }
     },
+
     fireWindowEvent: function (type, data) {
         var evt = createEvent(type, data);
         if (typeof windowEventHandlers[type] !== 'undefined') {
@@ -303,12 +310,11 @@ var cordova = {
             }
         } catch (err) {
             var msg = 'Error in ' + (isSuccess ? 'Success' : 'Error') + ' callbackId: ' + callbackId + ' : ' + err;
-            console && console.log && console.log(msg);
-            console && console.log && err.stack && console.log(err.stack);
-            cordova.fireWindowEvent('cordovacallbackerror', { 'message': msg });
+            cordova.fireWindowEvent('cordovacallbackerror', { message: msg, error: err });
             throw err;
         }
     },
+
     addConstructor: function (func) {
         channel.onCordovaReady.subscribe(function () {
             try {
@@ -332,18 +338,47 @@ var utils = require('cordova/utils');
 var moduleExports = module.exports;
 
 var typeMap = {
-    'A': 'Array',
-    'D': 'Date',
-    'N': 'Number',
-    'S': 'String',
-    'F': 'Function',
-    'O': 'Object'
+    A: 'Array',
+    D: 'Date',
+    N: 'Number',
+    S: 'String',
+    F: 'Function',
+    O: 'Object'
 };
 
 function extractParamName (callee, argIndex) {
-    return (/.*?\((.*?)\)/).exec(callee)[1].split(', ')[argIndex];
+    return (/\(\s*([^)]*?)\s*\)/).exec(callee)[1].split(/\s*,\s*/)[argIndex];
 }
 
+/**
+ * Checks the given arguments' types and throws if they are not as expected.
+ *
+ * `spec` is a string where each character stands for the required type of the
+ * argument at the same position. In other words: the character at `spec[i]`
+ * specifies the required type for `args[i]`. The characters in `spec` are the
+ * first letter of the required type's name. The supported types are:
+ *
+ *     Array, Date, Number, String, Function, Object
+ *
+ * Lowercase characters specify arguments that must not be `null` or `undefined`
+ * while uppercase characters allow those values to be passed.
+ *
+ * Finally, `*` can be used to allow any type at the corresponding position.
+ *
+ * @example
+ * function foo (arr, opts) {
+ *     // require `arr` to be an Array and `opts` an Object, null or undefined
+ *     checkArgs('aO', 'my.package.foo', arguments);
+ *     // ...
+ * }
+ * @param {String} spec - the type specification for `args` as described above
+ * @param {String} functionName - full name of the callee.
+ * Used in the error message
+ * @param {Array|arguments} args - the arguments to be checked against `spec`
+ * @param {Function} [opt_callee=args.callee] - the recipient of `args`.
+ * Used to extract parameter names for the error message
+ * @throws {TypeError} if args do not satisfy spec
+ */
 function checkArgs (spec, functionName, args, opt_callee) {
     if (!moduleExports.enableChecks) {
         return;
@@ -394,62 +429,30 @@ define("cordova/base64", function(require, exports, module) {
 var base64 = exports;
 
 base64.fromArrayBuffer = function (arrayBuffer) {
-    var array = new Uint8Array(arrayBuffer);
-    return uint8ToBase64(array);
+    return btoa(bufferToBinaryString(arrayBuffer));
 };
 
 base64.toArrayBuffer = function (str) {
-    var decodedStr = typeof atob !== 'undefined' ? atob(str) : Buffer.from(str, 'base64').toString('binary'); // eslint-disable-line no-undef
-    var arrayBuffer = new ArrayBuffer(decodedStr.length);
-    var array = new Uint8Array(arrayBuffer);
-    for (var i = 0, len = decodedStr.length; i < len; i++) {
-        array[i] = decodedStr.charCodeAt(i);
-    }
-    return arrayBuffer;
+    return binaryStringToBuffer(atob(str));
 };
 
-// ------------------------------------------------------------------------------
-
-/* This code is based on the performance tests at http://jsperf.com/b64tests
- * This 12-bit-at-a-time algorithm was the best performing version on all
- * platforms tested.
- */
-
-var b64_6bit = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
-var b64_12bit;
-
-var b64_12bitTable = function () {
-    b64_12bit = [];
-    for (var i = 0; i < 64; i++) {
-        for (var j = 0; j < 64; j++) {
-            b64_12bit[i * 64 + j] = b64_6bit[i] + b64_6bit[j];
-        }
+function bufferToBinaryString (buffer) {
+    var bytes = new Uint8Array(buffer);
+    var CHUNK_SIZE = 1 << 15;
+    var string = '';
+    for (var i = 0; i < bytes.length; i += CHUNK_SIZE) {
+        var chunk = bytes.subarray(i, i + CHUNK_SIZE);
+        string += String.fromCharCode.apply(null, chunk);
     }
-    b64_12bitTable = function () { return b64_12bit; };
-    return b64_12bit;
-};
+    return string;
+}
 
-function uint8ToBase64 (rawData) {
-    var numBytes = rawData.byteLength;
-    var output = '';
-    var segment;
-    var table = b64_12bitTable();
-    for (var i = 0; i < numBytes - 2; i += 3) {
-        segment = (rawData[i] << 16) + (rawData[i + 1] << 8) + rawData[i + 2];
-        output += table[segment >> 12];
-        output += table[segment & 0xfff];
+function binaryStringToBuffer (binaryString) {
+    var bytes = new Uint8Array(binaryString.length);
+    for (var i = 0; i < bytes.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
     }
-    if (numBytes - i === 2) {
-        segment = (rawData[i] << 16) + (rawData[i + 1] << 8);
-        output += table[segment >> 12];
-        output += b64_6bit[(segment & 0xfff) >> 6];
-        output += '=';
-    } else if (numBytes - i === 1) {
-        segment = (rawData[i] << 16);
-        output += table[segment >> 12];
-        output += '==';
-    }
-    return output;
+    return bytes.buffer;
 }
 
 });
@@ -461,14 +464,13 @@ var utils = require('cordova/utils');
 
 function each (objects, func, context) {
     for (var prop in objects) {
-        if (objects.hasOwnProperty(prop)) {
+        if (Object.prototype.hasOwnProperty.call(objects, prop)) {
             func.apply(context, [objects[prop], prop]);
         }
     }
 }
 
 function clobber (obj, key, value) {
-    exports.replaceHookForTesting(obj, key);
     var needsProperty = false;
     try {
         obj[key] = value;
@@ -542,7 +544,7 @@ function include (parent, objects, clobber, merge) {
  */
 function recursiveMerge (target, src) {
     for (var prop in src) {
-        if (src.hasOwnProperty(prop)) {
+        if (Object.prototype.hasOwnProperty.call(src, prop)) {
             if (target.prototype && target.prototype.constructor === target) {
                 // If the target object is a constructor override off prototype.
                 clobber(target.prototype, prop, src[prop]);
@@ -568,7 +570,6 @@ exports.buildIntoAndMerge = function (objects, target) {
 };
 exports.recursiveMerge = recursiveMerge;
 exports.assignOrWrapInDeprecateGetter = assignOrWrapInDeprecateGetter;
-exports.replaceHookForTesting = function () {};
 
 });
 
@@ -649,14 +650,14 @@ var channel = {
         }
         if (!len) h();
     },
-    /* eslint-disable no-return-assign */
+
     create: function (type) {
-        return channel[type] = new Channel(type, false);
+        return (channel[type] = new Channel(type, false));
     },
     createSticky: function (type) {
-        return channel[type] = new Channel(type, true);
+        return (channel[type] = new Channel(type, true));
     },
-    /* eslint-enable no-return-assign */
+
     /**
      * cordova Channels that must fire before "deviceready" is fired.
      */
@@ -777,7 +778,6 @@ Channel.prototype.unsubscribe = function (eventListenerOrFunction) {
  * Calls all functions subscribed to this channel.
  */
 Channel.prototype.fire = function (e) {
-    var fail = false; // eslint-disable-line no-unused-vars
     var fireArgs = Array.prototype.slice.call(arguments);
     // Apply stickiness.
     if (this.state === 1) {
@@ -834,59 +834,56 @@ module.exports = channel;
 
 });
 
-// file: /Users/erisu/git/apache/cordova/cordova-browser/cordova-js-src/confighelper.js
+// file: ../cordova-browser/cordova-js-src/confighelper.js
 define("cordova/confighelper", function(require, exports, module) {
 
-var config;
+let config;
 
-function Config(xhr) {
-    function loadPreferences(xhr) {
-       var parser = new DOMParser();
-       var doc = parser.parseFromString(xhr.responseText, "application/xml");
+function Config (xhr) {
+    function loadPreferences (xhr) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xhr.responseText, 'application/xml');
 
-       var preferences = doc.getElementsByTagName("preference");
-       return Array.prototype.slice.call(preferences);
+        const preferences = doc.getElementsByTagName('preference');
+        return Array.prototype.slice.call(preferences);
     }
 
     this.xhr = xhr;
     this.preferences = loadPreferences(this.xhr);
 }
 
-function readConfig(success, error) {
-    var xhr;
+function readConfig (success, error) {
+    const xhr = new XMLHttpRequest();
 
-    if(typeof config != 'undefined') {
+    if (typeof config !== 'undefined') {
         success(config);
     }
 
-    function fail(msg) {
+    function fail (msg) {
         console.error(msg);
 
-        if(error) {
+        if (error) {
             error(msg);
         }
     }
 
-    var xhrStatusChangeHandler = function() {
-        if (xhr.readyState == 4) {
-            if (xhr.status == 200 || xhr.status == 304 || xhr.status === 0 /* file:// */) {
+    const xhrStatusChangeHandler = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200 || xhr.status === 304 || xhr.status === 0 /* file:// */) {
                 config = new Config(xhr);
                 success(config);
-            }
-            else {
+            } else {
                 fail('[Browser][cordova.js][xhrStatusChangeHandler] Could not XHR config.xml: ' + xhr.statusText);
             }
         }
     };
 
-    xhr = new XMLHttpRequest();
-    xhr.addEventListener("load", xhrStatusChangeHandler);
-
+    xhr.addEventListener('load', xhrStatusChangeHandler);
 
     try {
-        xhr.open("get", "config.xml", true);
+        xhr.open('get', 'config.xml', true);
         xhr.send();
-    } catch(e) {
+    } catch (e) {
         fail('[Browser][cordova.js][readConfig] Could not XHR config.xml: ' + JSON.stringify(e));
     }
 }
@@ -895,12 +892,12 @@ function readConfig(success, error) {
  * Reads a preference value from config.xml.
  * Returns preference value or undefined if it does not exist.
  * @param {String} preferenceName Preference name to read */
-Config.prototype.getPreferenceValue = function getPreferenceValue(preferenceName) {
-    var preferenceItem = this.preferences && this.preferences.filter(function(item) {
+Config.prototype.getPreferenceValue = function getPreferenceValue (preferenceName) {
+    const preferenceItem = this.preferences && this.preferences.filter(function (item) {
         return item.attributes.name && item.attributes.name.value === preferenceName;
     });
 
-    if(preferenceItem && preferenceItem[0] && preferenceItem[0].attributes && preferenceItem[0].attributes.value) {
+    if (preferenceItem && preferenceItem[0] && preferenceItem[0].attributes && preferenceItem[0].attributes.value) {
         return preferenceItem[0].attributes.value.value;
     }
 };
@@ -909,14 +906,14 @@ exports.readConfig = readConfig;
 
 });
 
-// file: /Users/erisu/git/apache/cordova/cordova-browser/cordova-js-src/exec.js
+// file: ../cordova-browser/cordova-js-src/exec.js
 define("cordova/exec", function(require, exports, module) {
 
-/*jslint sloppy:true, plusplus:true*/
-/*global require, module, console */
+/* jslint sloppy:true, plusplus:true */
+/* global require, module, console */
 
-var cordova = require('cordova');
-var execProxy = require('cordova/exec/proxy');
+const cordova = require('cordova');
+const execProxy = require('cordova/exec/proxy');
 
 /**
  * Execute a cordova command.  It is up to the native side whether this action
@@ -933,35 +930,29 @@ var execProxy = require('cordova/exec/proxy');
  * @param {String[]} [args]     Zero or more arguments to pass to the method
  */
 module.exports = function (success, fail, service, action, args) {
-
-    var proxy = execProxy.get(service, action);
+    const proxy = execProxy.get(service, action);
 
     args = args || [];
 
     if (proxy) {
-        
-        var callbackId = service + cordova.callbackId++;
-        
-        if (typeof success === "function" || typeof fail === "function") {
-            cordova.callbacks[callbackId] = {success: success, fail: fail};
+        const callbackId = service + cordova.callbackId++;
+
+        if (typeof success === 'function' || typeof fail === 'function') {
+            cordova.callbacks[callbackId] = { success, fail };
         }
         try {
-
-            
-
             // callbackOptions param represents additional optional parameters command could pass back, like keepCallback or
             // custom callbackId, for example {callbackId: id, keepCallback: true, status: cordova.callbackStatus.JSON_EXCEPTION }
-            var onSuccess = function (result, callbackOptions) {
+            const onSuccess = function (result, callbackOptions) {
                 callbackOptions = callbackOptions || {};
-                var callbackStatus;
+                let callbackStatus;
                 // covering both undefined and null.
                 // strict null comparison was causing callbackStatus to be undefined
                 // and then no callback was called because of the check in cordova.callbackFromNative
                 // see CB-8996 Mobilespec app hang on windows
                 if (callbackOptions.status !== undefined && callbackOptions.status !== null) {
                     callbackStatus = callbackOptions.status;
-                }
-                else {
+                } else {
                     callbackStatus = cordova.callbackStatus.OK;
                 }
                 cordova.callbackSuccess(callbackOptions.callbackId || callbackId,
@@ -971,37 +962,34 @@ module.exports = function (success, fail, service, action, args) {
                         keepCallback: callbackOptions.keepCallback || false
                     });
             };
-            var onError = function (err, callbackOptions) {
+            const onError = function (err, callbackOptions) {
                 callbackOptions = callbackOptions || {};
-                var callbackStatus;
+                let callbackStatus;
                 // covering both undefined and null.
                 // strict null comparison was causing callbackStatus to be undefined
                 // and then no callback was called because of the check in cordova.callbackFromNative
                 // note: status can be 0
                 if (callbackOptions.status !== undefined && callbackOptions.status !== null) {
                     callbackStatus = callbackOptions.status;
-                }
-                else {
+                } else {
                     callbackStatus = cordova.callbackStatus.OK;
                 }
                 cordova.callbackError(callbackOptions.callbackId || callbackId,
-                {
-                    status: callbackStatus,
-                    message: err,
-                    keepCallback: callbackOptions.keepCallback || false
-                });
+                    {
+                        status: callbackStatus,
+                        message: err,
+                        keepCallback: callbackOptions.keepCallback || false
+                    });
             };
             proxy(onSuccess, onError, args);
-
         } catch (e) {
-            console.log("Exception calling native with command :: " + service + " :: " + action  + " ::exception=" + e);
+            console.log('Exception calling native with command :: ' + service + ' :: ' + action + ' ::exception=' + e);
         }
     } else {
+        console.log('Error: exec proxy not found for :: ' + service + ' :: ' + action);
 
-        console.log("Error: exec proxy not found for :: " + service + " :: " + action);
-        
-        if(typeof fail === "function" ) {
-            fail("Missing Command Error");
+        if (typeof fail === 'function') {
+            fail('Missing Command Error');
         }
     }
 };
@@ -1046,7 +1034,6 @@ var cordova = require('cordova');
 var modulemapper = require('cordova/modulemapper');
 var platform = require('cordova/platform');
 var pluginloader = require('cordova/pluginloader');
-var utils = require('cordova/utils');
 
 var platformInitChannelsArray = [channel.onNativeReady, channel.onPluginsReady];
 
@@ -1065,34 +1052,6 @@ window.setTimeout(function () {
         logUnfiredChannels(channel.deviceReadyChannelsArray);
     }
 }, 5000);
-
-// Replace navigator before any modules are required(), to ensure it happens as soon as possible.
-// We replace it so that properties that can't be clobbered can instead be overridden.
-function replaceNavigator (origNavigator) {
-    var CordovaNavigator = function () {};
-    CordovaNavigator.prototype = origNavigator;
-    var newNavigator = new CordovaNavigator();
-    // This work-around really only applies to new APIs that are newer than Function.bind.
-    // Without it, APIs such as getGamepads() break.
-    if (CordovaNavigator.bind) {
-        for (var key in origNavigator) {
-            if (typeof origNavigator[key] === 'function') {
-                newNavigator[key] = origNavigator[key].bind(origNavigator);
-            } else {
-                (function (k) {
-                    utils.defineGetterSetter(newNavigator, key, function () {
-                        return origNavigator[k];
-                    });
-                })(key);
-            }
-        }
-    }
-    return newNavigator;
-}
-
-if (window.navigator) {
-    window.navigator = replaceNavigator(window.navigator);
-}
 
 if (!window.console) {
     window.console = {
@@ -1159,7 +1118,6 @@ channel.join(function () {
     channel.join(function () {
         require('cordova').fireDocumentEvent('deviceready');
     }, channel.deviceReadyChannelsArray);
-
 }, platformInitChannelsArray);
 
 });
@@ -1168,7 +1126,7 @@ channel.join(function () {
 define("cordova/modulemapper", function(require, exports, module) {
 
 var builder = require('cordova/builder');
-var moduleMap = define.moduleMap; // eslint-disable-line no-undef
+var moduleMap = define.moduleMap;
 var symbolList;
 var deprecationMap;
 
@@ -1208,12 +1166,9 @@ function prepareNamespace (symbolPath, context) {
     if (!symbolPath) {
         return context;
     }
-    var parts = symbolPath.split('.');
-    var cur = context;
-    for (var i = 0, part; part = parts[i]; ++i) { // eslint-disable-line no-cond-assign
-        cur = cur[part] = cur[part] || {};
-    }
-    return cur;
+    return symbolPath.split('.').reduce(function (cur, part) {
+        return (cur[part] = cur[part] || {});
+    }, context);
 }
 
 exports.mapModules = function (context) {
@@ -1264,27 +1219,25 @@ exports.reset();
 
 });
 
-// file: /Users/erisu/git/apache/cordova/cordova-browser/cordova-js-src/platform.js
+// file: ../cordova-browser/cordova-js-src/platform.js
 define("cordova/platform", function(require, exports, module) {
 
 module.exports = {
     id: 'browser',
     cordovaVersion: '4.2.0', // cordova-js
 
-    bootstrap: function() {
-
-        var modulemapper = require('cordova/modulemapper');
-        var channel = require('cordova/channel');
+    bootstrap: function () {
+        const modulemapper = require('cordova/modulemapper');
+        const channel = require('cordova/channel');
 
         modulemapper.clobbers('cordova/exec/proxy', 'cordova.commandProxy');
 
         channel.onNativeReady.fire();
 
-        document.addEventListener("visibilitychange", function(){
-            if(document.hidden) {
+        document.addEventListener('visibilitychange', function () {
+            if (document.hidden) {
                 channel.onPause.fire();
-            }
-            else {
+            } else {
                 channel.onResume.fire();
             }
         });
@@ -1314,11 +1267,11 @@ exports.injectScript = function (url, onload, onerror) {
 
 function injectIfNecessary (id, url, onload, onerror) {
     onerror = onerror || onload;
-    if (id in define.moduleMap) { // eslint-disable-line no-undef
+    if (id in define.moduleMap) {
         onload();
     } else {
         exports.injectScript(url, function () {
-            if (id in define.moduleMap) { // eslint-disable-line no-undef
+            if (id in define.moduleMap) {
                 onload();
             } else {
                 onerror();
@@ -1329,7 +1282,7 @@ function injectIfNecessary (id, url, onload, onerror) {
 
 function onScriptLoadingComplete (moduleList, finishPluginLoading) {
     // Loop through all the plugins and then through their clobbers and merges.
-    for (var i = 0, module; module = moduleList[i]; i++) { // eslint-disable-line no-cond-assign
+    for (var i = 0, module; (module = moduleList[i]); i++) {
         if (module.clobbers && module.clobbers.length) {
             for (var j = 0; j < module.clobbers.length; j++) {
                 modulemapper.clobbers(module.id, module.clobbers[j]);
@@ -1512,10 +1465,11 @@ utils.clone = function (obj) {
 
     retVal = {};
     for (i in obj) {
-        // https://issues.apache.org/jira/browse/CB-11522 'unknown' type may be returned in
-        // custom protocol activation case on Windows Phone 8.1 causing "No such interface supported" exception
-        // on cloning.
-        if ((!(i in retVal) || retVal[i] !== obj[i]) && typeof obj[i] !== 'undefined' && typeof obj[i] !== 'unknown') { // eslint-disable-line valid-typeof
+        // 'unknown' type may be returned in custom protocol activation case on
+        // Windows Phone 8.1 causing "No such interface supported" exception on
+        // cloning (https://issues.apache.org/jira/browse/CB-11522)
+        // eslint-disable-next-line valid-typeof
+        if ((!(i in retVal) || retVal[i] !== obj[i]) && typeof obj[i] !== 'undefined' && typeof obj[i] !== 'unknown') {
             retVal[i] = utils.clone(obj[i]);
         }
     }
@@ -1565,7 +1519,6 @@ utils.extend = (function () {
     var F = function () {};
     // extend Child from Parent
     return function (Child, Parent) {
-
         F.prototype = Parent.prototype;
         Child.prototype = new F();
         Child.__super__ = Parent.prototype;
@@ -1588,7 +1541,6 @@ utils.alert = function (msg) {
 
 window.cordova = require('cordova');
 // file: src/scripts/bootstrap.js
-
 require('cordova/init');
 
 })();
