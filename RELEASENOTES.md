@@ -20,6 +20,25 @@
 -->
 ## Release Notes for Cordova Browser ##
 
+### 7.0.0 (May 13, 2023)
+
+#### Breaking Changes
+
+* [GH-121](https://github.com/apache/cordova-browser/pull/121) Minimum NodeJS Required: 16.13.0
+* [GH-115](https://github.com/apache/cordova-browser/pull/115) Update ShellJS to 0.8.5.
+* [GH-78](https://github.com/apache/cordova-browser/pull/78) feat: Replace `Q` with native Promises.
+
+#### Other Notable Changes
+
+* [GH-117](https://github.com/apache/cordova-browser/pull/117) Added `.npmrc` file to ensure the official NPM registry is used during development and deployments.
+* [GH-107](https://github.com/apache/cordova-browser/pull/107) Enabled `package-lock.json` file.
+* [GH-119](https://github.com/apache/cordova-browser/pull/119) Added NodeJS 20 to our test matrix.
+* [GH-118](https://github.com/apache/cordova-browser/pull/118) Updated ESLint config to match better match Apache Cordova's coding style standards.
+* [GH-80](https://github.com/apache/cordova-browser/pull/80) Enabled CodeCov test coverage
+* [GH-113](https://github.com/apache/cordova-browser/pull/113) Migrated to GitHub Action workflows for our testing CI.
+
+For a full list of changes, see the [commit history](https://github.com/apache/cordova-browser/compare/rel/6.0.0...4669c4dce952c658ba7eb951ebfcae35b96a56ea)
+
 ### 6.0.0 (Feb 01, 2019)
 * [GH-70](https://github.com/apache/cordova-browser/pull/70) Browser Platform Release Preparation (Cordova 9)
 * [GH-68](https://github.com/apache/cordova-browser/pull/68) Copy node_modules if the directory exists
