@@ -27,7 +27,7 @@ const args = process.argv;
 start(args);
 
 function start (argv) {
-    const args = nopt({ help: Boolean, target: String, port: Number }, { help: ['/?', '-h', 'help', '-help', '/help'] }, argv);
+    const args = nopt({ help: Boolean, target: String, port: Number, https: Boolean }, { help: ['/?', '-h', 'help', '-help', '/help'] }, argv);
     if (args.help) {
         help();
     } else {
@@ -36,13 +36,15 @@ function start (argv) {
 }
 
 function help () {
-    console.log('\nUsage: run [ --target=<browser> ] [ --port=<number> ]');
+    console.log('\nUsage: run [ --target=<browser> ] [ --port=<number> ] [ --https]');
     console.log('    --target=<browser> : Launches the specified browser. Chrome is default.');
     console.log('    --port=<number>    : Http server uses specified port number.');
+    console.log('    --https            : Http server runs over SSL.');
     console.log('Examples:');
     console.log('    run');
     console.log('    run -- --target=ie');
     console.log('    run -- --target=chrome --port=8000');
+    console.log('    run -- --target=chrome --port=8000 --https');
     console.log('');
     process.exit(0);
 }
