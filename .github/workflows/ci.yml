@@ -57,7 +57,6 @@ jobs:
             paths-ignore:
               - coverage
               - node_modules
-              - templates/project/www/cordova.js
 
       - name: npm install and test
         run: |
