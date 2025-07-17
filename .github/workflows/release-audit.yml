@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Node CI
+name: Release Auditing
 
 on:
   push:
@@ -30,39 +30,25 @@ permissions:
 
 jobs:
   test:
-    name: NodeJS ${{ matrix.node-version }} on ${{ matrix.os }}
-
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        node-version: [20.x, 22.x, 24.x]
-        os: [ubuntu-latest, windows-latest, macos-latest]
-
+    name: Audit Licenses
+    runs-on: ubuntu-latest
     steps:
+      # Checkout project
       - uses: actions/checkout@v4
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      # Check license headers
+      - uses: erisu/apache-rat-action@3127a8c18f3bb10e91c60e835144085b31c5c463
+
+      # Setup environment with node
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20
 
-      - name: Environment Information
-        run: |
-          node --version
-          npm --version
+      # Install node packages
+      - name: npm install packages
+        run: npm i
 
-      - name: npm install and test
-        run: |
-          npm i
-          npm t
-        env:
-          CI: true
-
-      # v4.6.0
-      - uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
-        if: success()
+      # Check node package licenses
+      - uses: erisu/license-checker-action@e929758f9416f30234ac454fc9054ca4b803871d
         with:
-          name: ${{ runner.os }} node.js ${{ matrix.node-version }}
-          token: ${{ secrets.CORDOVA_CODECOV_TOKEN }}
-          fail_ci_if_error: false
+          license-config: 'licence_checker.yml'

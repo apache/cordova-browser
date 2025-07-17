@@ -1,3 +1,5 @@
-manifest.webapp
-jasmine.json
-manifest.json
+\.(.*)
+(.*).txt
+coverage
+node_modules
+VERSION
