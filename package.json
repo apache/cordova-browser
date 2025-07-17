@@ -24,7 +24,7 @@
     "shelljs": "^0.10.0"
   },
   "devDependencies": {
-    "@cordova/eslint-config": "^5.0.0",
+    "@cordova/eslint-config": "^5.1.0",
     "jasmine": "^5.8.0",
     "nyc": "^17.1.0",
     "tmp": "^0.2.3"
