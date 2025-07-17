@@ -21,7 +21,7 @@
     "cordova-common": "^5.0.1",
     "cordova-serve": "^4.0.1",
     "nopt": "^7.1.0",
-    "shelljs": "^0.8.5"
+    "shelljs": "^0.10.0"
   },
   "devDependencies": {
     "@cordova/eslint-config": "^5.0.0",
