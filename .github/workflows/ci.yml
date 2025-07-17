@@ -31,10 +31,10 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -50,7 +50,8 @@ jobs:
         env:
           CI: true
 
-      - uses: codecov/codecov-action@v4
+      # v4.6.0
+      - uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
         if: success()
         with:
           name: ${{ runner.os }} node.js ${{ matrix.node-version }}
