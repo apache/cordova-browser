@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@cordova/eslint-config": "^5.0.0",
-    "jasmine": "^4.6.0",
+    "jasmine": "^5.8.0",
     "nyc": "^15.1.0",
     "tmp": "^0.2.1"
   },
