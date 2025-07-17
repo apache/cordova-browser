@@ -27,7 +27,7 @@
     "@cordova/eslint-config": "^5.0.0",
     "jasmine": "^5.8.0",
     "nyc": "^17.1.0",
-    "tmp": "^0.2.1"
+    "tmp": "^0.2.3"
   },
   "author": "Apache Software Foundation",
   "license": "Apache-2.0",
