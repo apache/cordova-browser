@@ -17,7 +17,16 @@
 
 name: Node CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
+  pull_request:
+    branches:
+      - '*'
+
+permissions:
+  contents: read
 
 jobs:
   test:
