@@ -20,6 +20,6 @@
 */
 
 // Coho updates this line:
-const VERSION = '7.1.0-dev';
+const VERSION = '8.0.0-dev';
 
 console.log(VERSION);
