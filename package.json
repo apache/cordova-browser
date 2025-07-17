@@ -20,7 +20,7 @@
   "dependencies": {
     "cordova-common": "^5.0.1",
     "cordova-serve": "^4.0.1",
-    "nopt": "^7.1.0",
+    "nopt": "^8.1.0",
     "shelljs": "^0.10.0"
   },
   "devDependencies": {
