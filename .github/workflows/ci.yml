@@ -27,6 +27,7 @@ on:
 
 permissions:
   contents: read
+  security-events: write
 
 jobs:
   test:
@@ -52,12 +53,28 @@ jobs:
           node --version
           npm --version
 
+      # "cordova-lib/cordova.js" is ignored because it is a generated file.
+      # It contains mixed content from the npm package "cordova-js" and "./cordova-js-src".
+      # The report might not be resolvable because of the external package.
+      # If the report is related to this repository, it would be detected when scanning "./cordova-js-src".
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          queries: security-and-quality
+          config: |
+            paths-ignore:
+              - coverage
+              - node_modules
+              - cordova-lib/cordova.js
+
       - name: npm install and test
         run: |
           npm i
           npm t
         env:
           CI: true
+
+      - uses: github/codeql-action/analyze@v3
 
       # v4.6.0
       - uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238
