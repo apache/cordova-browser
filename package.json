@@ -32,7 +32,7 @@
   "author": "Apache Software Foundation",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=20.5.0"
+    "node": "^20.17.0 || >=22.9.0"
   },
   "c8": {
     "include": [
