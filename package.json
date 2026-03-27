@@ -13,7 +13,8 @@
   ],
   "scripts": {
     "cover": "c8 jasmine",
-    "lint": "eslint . \"bin/**/!(*.*|gitignore)\"",
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix",
     "jasmine": "jasmine",
     "test": "npm run lint && npm run cover"
   },
@@ -24,7 +25,7 @@
     "shelljs": "^0.10.0"
   },
   "devDependencies": {
-    "@cordova/eslint-config": "^5.1.0",
+    "@cordova/eslint-config": "^6.0.1",
     "c8": "^11.0.0",
     "jasmine": "^6.1.0",
     "tmp": "^0.2.5"
