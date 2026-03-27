@@ -72,7 +72,7 @@ function createAndBuild (projectname, projectid) {
     shell.rm('-rf', tmpDir);
 }
 
-describe('create', function () {
+describe('manifest', function () {
     it('create project with manifest.json', function () {
         const projectname = 'testcreate';
         const projectid = 'com.test.app1';
