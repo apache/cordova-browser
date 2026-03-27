@@ -24,3 +24,4 @@ temp
 node_modules/
 coverage/
 .nyc_output/
+bin/template/www/cordova.js

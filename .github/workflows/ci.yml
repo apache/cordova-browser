@@ -53,7 +53,7 @@ jobs:
           node --version
           npm --version
 
-      # "cordova-lib/cordova.js" is ignored because it is a generated file.
+      # "bin/template/www/cordova.js" is ignored because it is a generated file.
       # It contains mixed content from the npm package "cordova-js" and "./cordova-js-src".
       # The report might not be resolvable because of the external package.
       # If the report is related to this repository, it would be detected when scanning "./cordova-js-src".
@@ -65,7 +65,7 @@ jobs:
             paths-ignore:
               - coverage
               - node_modules
-              - cordova-lib/cordova.js
+              - bin/template/www/cordova.js
 
       - name: npm install and test
         run: |
