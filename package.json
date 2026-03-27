@@ -12,7 +12,7 @@
     "apache"
   ],
   "scripts": {
-    "cover": "nyc jasmine",
+    "cover": "c8 jasmine",
     "lint": "eslint . \"bin/**/!(*.*|gitignore)\"",
     "jasmine": "jasmine",
     "test": "npm run lint && npm run cover"
@@ -25,8 +25,8 @@
   },
   "devDependencies": {
     "@cordova/eslint-config": "^5.1.0",
+    "c8": "^11.0.0",
     "jasmine": "^6.1.0",
-    "nyc": "^17.1.0",
     "tmp": "^0.2.3"
   },
   "author": "Apache Software Foundation",
@@ -34,7 +34,7 @@
   "engines": {
     "node": ">=20.5.0"
   },
-  "nyc": {
+  "c8": {
     "include": [
       "bin/lib/**",
       "bin/templates/cordova/**"
