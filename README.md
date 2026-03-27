@@ -18,6 +18,7 @@
 # under the License.
 #
 -->
+
 [![Node CI](https://github.com/apache/cordova-browser/workflows/Node%20CI/badge.svg?branch=master)](https://github.com/apache/cordova-browser/actions?query=branch%3Amaster)
 [![codecov.io](https://codecov.io/github/apache/cordova-browser/coverage.svg?branch=master)](https://codecov.io/github/apache/cordova-browser?branch=master)
 

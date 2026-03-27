@@ -18,6 +18,7 @@
 # under the License.
 #
 -->
+
 ## Release Notes for Cordova Browser ##
 
 ### 7.0.0 (May 13, 2023)
