@@ -12,29 +12,30 @@
     "apache"
   ],
   "scripts": {
-    "cover": "nyc jasmine",
-    "lint": "eslint . \"bin/**/!(*.*|gitignore)\"",
+    "cover": "c8 jasmine",
+    "lint": "eslint .",
+    "lint:fix": "npm run lint -- --fix",
     "jasmine": "jasmine",
     "test": "npm run lint && npm run cover"
   },
   "dependencies": {
-    "cordova-common": "^5.0.1",
+    "cordova-common": "^6.0.0",
     "cordova-serve": "^4.0.1",
-    "nopt": "^8.1.0",
+    "nopt": "^9.0.0",
     "shelljs": "^0.10.0"
   },
   "devDependencies": {
-    "@cordova/eslint-config": "^5.1.0",
-    "jasmine": "^5.8.0",
-    "nyc": "^17.1.0",
-    "tmp": "^0.2.3"
+    "@cordova/eslint-config": "^6.0.1",
+    "c8": "^11.0.0",
+    "jasmine": "^6.1.0",
+    "tmp": "^0.2.5"
   },
   "author": "Apache Software Foundation",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=20.5.0"
+    "node": "^20.17.0 || >=22.9.0"
   },
-  "nyc": {
+  "c8": {
     "include": [
       "bin/lib/**",
       "bin/templates/cordova/**"
