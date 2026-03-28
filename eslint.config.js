@@ -30,12 +30,6 @@ module.exports = defineConfig([
     ...nodeConfig.map(config => ({
         files: [
             '**/*.js',
-            'bin/create',
-            'bin/update',
-            'bin/template/cordova/build',
-            'bin/template/cordova/clean',
-            'bin/template/cordova/log',
-            'bin/template/cordova/run',
             'bin/template/cordova/version'
         ],
         ...config
