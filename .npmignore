@@ -15,23 +15,22 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# System
-.DS_Store
+# Config related files
+.*
 
-# IDE
-.vscode
+# Testing, code coverage, and linting
+coverage
+spec
+eslint.config.js
+licence_checker.yml
 
-# npm
-npm-debug.log
-node_modules/
-
-# Testing, code coverage, and linting output
-coverage/
-.nyc_output/
-temp
+# Logging
+logs
+*.log
+npm-debug.log*
 
 # Output of 'npm pack'
 *.tgz
 
-# Other
-bin/template/www/cordova.js
+# others
+cordova-js-src
