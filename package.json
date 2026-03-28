@@ -12,6 +12,7 @@
     "apache"
   ],
   "scripts": {
+    "prepare": "cordova-js build > bin/template/www/cordova.js",
     "cover": "c8 jasmine",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@cordova/eslint-config": "^6.0.1",
     "c8": "^11.0.0",
+    "cordova-js": "^6.1.0",
     "jasmine": "^6.1.0",
     "tmp": "^0.2.5"
   },
