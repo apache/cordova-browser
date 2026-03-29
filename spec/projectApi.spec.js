@@ -17,8 +17,8 @@
     under the License.
 */
 
-const path = require('path');
-const EventEmitter = require('events');
+const path = require('node:path');
+const EventEmitter = require('node:events');
 
 const Api = require('../bin/template/cordova/Api');
 const create = require('../bin/lib/create');

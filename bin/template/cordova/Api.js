@@ -22,9 +22,8 @@
     'cordova platform add PATH' where path is this repo.
 */
 
-const shell = require('shelljs');
-const path = require('path');
-const fs = require('fs');
+const path = require('node:path');
+const fs = require('node:fs');
 
 const cdvcmn = require('cordova-common');
 const CordovaLogger = cdvcmn.CordovaLogger;
@@ -153,13 +152,13 @@ Api.prototype.prepare = async function (cordovaProject, options) {
     // restored or copy project config into platform if none exists.
     if (fs.existsSync(defaultConfigPath)) {
         this.events.emit('verbose', 'Generating config.xml from defaults for platform "' + this.platform + '"');
-        shell.cp('-f', defaultConfigPath, ownConfigPath);
+        fs.cpSync(defaultConfigPath, ownConfigPath, { force: true });
     } else if (fs.existsSync(ownConfigPath)) {
         this.events.emit('verbose', 'Generating defaults.xml from own config.xml for platform "' + this.platform + '"');
-        shell.cp('-f', ownConfigPath, defaultConfigPath);
+        fs.cpSync(ownConfigPath, defaultConfigPath, { force: true });
     } else {
         this.events.emit('verbose', 'case 3"' + this.platform + '"');
-        shell.cp('-f', sourceCfg.path, ownConfigPath);
+        fs.cpSync(sourceCfg.path, ownConfigPath, { force: true });
     }
 
     // merge our configs
@@ -181,7 +180,7 @@ Api.prototype.prepare = async function (cordovaProject, options) {
         // just blindly copy it to our output/www
         // todo: validate it? ensure all properties we expect exist?
         this.events.emit('verbose', 'copying ' + srcManifestPath + ' => ' + manifestPath);
-        shell.cp('-f', srcManifestPath, manifestPath);
+        fs.cpSync(srcManifestPath, manifestPath, { force: true });
     } else {
         const manifestJson = {
             background_color: '#FFF',
@@ -269,7 +268,11 @@ Api.prototype.prepare = async function (cordovaProject, options) {
     }
 
     // Copy munged config.xml to platform www dir
-    shell.cp('-rf', this.locations.configXml, this.locations.www);
+    fs.cpSync(
+        this.locations.configXml,
+        path.join(this.locations.www, 'config.xml'),
+        { force: true, recursive: true }
+    );
 };
 
 // Replace the www dir with contents of platform_www and app www.
@@ -391,7 +394,10 @@ Api.prototype.removePlugin = function (plugin, uninstallOptions) {
             self._removeModulesInfo(plugin, targetDir);
             // Remove stale plugin directory
             // TODO: this should be done by plugin files uninstaller
-            shell.rm('-rf', path.resolve(self.root, 'Plugins', plugin.id));
+            fs.rmSync(
+                path.resolve(self.root, 'Plugins', plugin.id),
+                { force: true, recursive: true }
+            );
         });
 };
 
@@ -505,7 +511,7 @@ Api.prototype._writePluginModules = function (targetDir) {
     final_contents += '// BOTTOM OF METADATA\n';
     final_contents += '});'; // Close cordova.define.
 
-    shell.mkdir('-p', targetDir);
+    fs.mkdirSync(targetDir, { recursive: true });
     fs.writeFileSync(path.join(targetDir, 'cordova_plugins.js'), final_contents, 'utf-8');
 };
 

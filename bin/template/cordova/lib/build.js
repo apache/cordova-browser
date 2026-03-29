@@ -19,7 +19,7 @@
     under the License.
 */
 
-const path = require('path');
+const path = require('node:path');
 const check_reqs = require('./check_reqs');
 
 /**
