@@ -17,95 +17,120 @@
     under the License.
 */
 
-const shell = require('shelljs');
-const fs = require('fs');
-const path = require('path');
-const util = require('util');
+const fs = require('node:fs');
+const path = require('node:path');
+const tmp = require('tmp');
+const create = require('../bin/lib/create');
 
-const cordova_bin = path.join(__dirname, '../bin');// is this the same on all platforms?
-const tmpDir = path.join(__dirname, '../temp');
-const createScriptPath = path.join(cordova_bin, 'create');
+tmp.setGracefulCleanup();
 
-function createAndBuild (projectname, projectid) {
-    let return_code = 0;
-    let command;
-
-    // remove existing folder
-    shell.rm('-rf', tmpDir);
-    shell.mkdir(tmpDir);
-
-    // create the project
-    command = util.format('"%s" "%s/%s" "%s" "%s"', createScriptPath, tmpDir, projectname, projectid, projectname);
-    // shell.echo(command);
-    return_code = shell.exec(command).code;
-    expect(return_code).toBe(0);
-
-    const tempCordovaScriptsPath = path.join(tmpDir, projectname, 'cordova');
-
-    console.log('tempCordovaScriptsPath = ' + tempCordovaScriptsPath);
-
-    // created project has scripts in the cordova folder
-    // build, clean, log, run, version
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'build'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'clean'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'log'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'run'))).toBe(true);
-    expect(fs.existsSync(path.join(tempCordovaScriptsPath, 'version'))).toBe(true);
-
-    // // build the project
-    command = util.format('"%s/cordova/build"', path.join(tmpDir, projectname));
-    // shell.echo(command);
-    return_code = shell.exec(command, { silent: true }).code;
-    expect(return_code).toBe(0);
-
-    // clean-up
-    shell.rm('-rf', tmpDir);
+function makeTempDir () {
+    const tempdir = tmp.dirSync({ unsafeCleanup: true });
+    return path.join(tempdir.name, `cordova-browser-create-test-${Date.now()}`);
 }
 
-describe('create', function () {
-    it('has a create script in bin/cordova', function () {
-        expect(fs.existsSync(createScriptPath)).toBe(true);
+/**
+ * Verifies that some of the project file exists. Not all will be tested.
+ * E.g. App's resource directory, xcodeproj, xcworkspace, and CordovaLib.
+ *
+ * @param {String} tmpDir
+ * @param {String} projectName
+ */
+function verifyProjectFiles (tmpDir, projectName) {
+    expect(fs.existsSync(path.join(tmpDir, 'www'))).toBe(true);
+    expect(fs.existsSync(path.join(tmpDir, 'platform_www'))).toBe(true);
+}
+
+/**
+ * Runs various project creation checks.
+ *
+ * @param {String} tmpDir
+ * @param {String} packageName
+ * @param {String} projectName
+ * @returns {Promise}
+ */
+async function verifyCreatedProject (tmpDir, packageName, projectName) {
+    await create.createProject(tmpDir, packageName, projectName)
+        .then(() => verifyProjectFiles(tmpDir, projectName));
+}
+
+function verifyManifestFiles (tmpDir, projectName) {
+    const manifestPath = path.join(tmpDir, 'platform_www/manifest.json');
+    expect(fs.existsSync(manifestPath)).toBe(true);
+    const manifestObj = require(manifestPath);
+    expect(manifestObj.name).toBe(projectName);
+    // start_url
+    expect(manifestObj.start_url).toBe('index.html');
+    // display
+    expect(manifestObj.display).toBe('standalone');
+    // description
+    expect(manifestObj.description).toBeDefined();
+    // background_color
+    expect(manifestObj.background_color).toBeDefined();
+    // theme_color
+    expect(manifestObj.theme_color).toBeDefined();
+    // scope
+    expect(manifestObj.scope).toBeDefined();
+    // orientation
+    expect(manifestObj.orientation).toBeDefined();
+    // icons
+    expect(manifestObj.icons).toBeDefined();
+    expect(Array.isArray(manifestObj.icons)).toBe(true);
+    expect(manifestObj.icons.length).toBeDefined();
+    expect(manifestObj.icons.length).toBeGreaterThan(0);
+}
+
+describe('create', () => {
+    let tmpDir;
+
+    beforeEach(function () {
+        tmpDir = makeTempDir();
+    });
+
+    afterEach(() => {
+        fs.rmSync(tmpDir, { recursive: true, force: true });
     });
 
     it('create project with ascii name, no spaces', function () {
-        const projectname = 'testcreate';
-        const projectid = 'com.test.app1';
-
-        createAndBuild(projectname, projectid);
+        const projectName = 'testcreate';
+        const packageName = 'com.test.app1';
+        return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
     it('create project with ascii name, and spaces', function () {
-        const projectname = 'test create';
-        const projectid = 'com.test.app2';
-
-        createAndBuild(projectname, projectid);
+        const projectName = 'test create';
+        const packageName = 'com.test.app2';
+        return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
     it('create project with unicode name, no spaces', function () {
-        const projectname = '応応応応用用用用';
-        const projectid = 'com.test.app3';
-
-        createAndBuild(projectname, projectid);
+        const projectName = '応応応応用用用用';
+        const packageName = 'com.test.app3';
+        return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
     it('create project with unicode name, and spaces', function () {
-        const projectname = '応応応応 用用用用';
-        const projectid = 'com.test.app4';
-
-        createAndBuild(projectname, projectid);
+        const projectName = '応応応応 用用用用';
+        const packageName = 'com.test.app4';
+        return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
     it('create project with ascii+unicode name, no spaces', function () {
-        const projectname = '応応応応hello用用用用';
-        const projectid = 'com.test.app5';
-
-        createAndBuild(projectname, projectid);
+        const projectName = '応応応応hello用用用用';
+        const packageName = 'com.test.app5';
+        return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
     it('create project with ascii+unicode name, and spaces', function () {
-        const projectname = '応応応応 hello 用用用用';
-        const projectid = 'com.test.app6';
+        const projectName = '応応応応 hello 用用用用';
+        const packageName = 'com.test.app6';
+        return verifyCreatedProject(tmpDir, packageName, projectName);
+    });
 
-        createAndBuild(projectname, projectid);
+    it('should have manifest.json', function () {
+        const projectName = 'testcreate';
+        const packageName = 'com.test.app1';
+        return verifyCreatedProject(tmpDir, packageName, projectName)
+            .then(() => verifyManifestFiles(tmpDir, projectName));
     });
 });

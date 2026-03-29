@@ -3,7 +3,6 @@
   "version": "8.0.0-dev",
   "description": "cordova-browser release",
   "main": "bin/template/cordova/Api.js",
-  "bin": "bin/create",
   "repository": "github:apache/cordova-browser",
   "bugs": "https://github.com/apache/cordova-browser/issues",
   "keywords": [
@@ -22,7 +21,6 @@
   "dependencies": {
     "cordova-common": "^6.0.0",
     "cordova-serve": "^4.0.1",
-    "nopt": "^9.0.0",
     "shelljs": "^0.10.0"
   },
   "devDependencies": {
