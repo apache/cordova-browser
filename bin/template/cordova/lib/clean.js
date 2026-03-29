@@ -19,9 +19,8 @@
     under the License.
 */
 
-const fs = require('fs');
-const shell = require('shelljs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const check_reqs = require('./check_reqs');
 const platformBuildDir = path.join('platforms', 'browser', 'www');
 
@@ -35,7 +34,7 @@ const run = function () {
 
     try {
         if (fs.existsSync(platformBuildDir)) {
-            shell.rm('-r', platformBuildDir);
+            fs.rmSync(platformBuildDir, { recursive: true });
         }
     } catch (err) {
         console.log('could not remove ' + platformBuildDir + ' : ' + err.message);

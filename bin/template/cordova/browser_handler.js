@@ -17,9 +17,8 @@
     under the License.
 */
 
-const path = require('path');
-const fs = require('fs');
-const shell = require('shelljs');
+const path = require('node:path');
+const fs = require('node:fs');
 const events = require('cordova-common').events;
 
 module.exports = {
@@ -59,7 +58,7 @@ module.exports = {
             scriptContent = 'cordova.define("' + moduleName + '", function(require, exports, module) { ' + scriptContent + '\n});\n';
 
             const moduleDestination = path.resolve(www_dir, 'plugins', plugin_id, jsModule.src);
-            shell.mkdir('-p', path.dirname(moduleDestination));
+            fs.mkdirSync(path.dirname(moduleDestination), { recursive: true });
             fs.writeFileSync(moduleDestination, scriptContent, 'utf-8');
         },
         uninstall: function (jsModule, www_dir, plugin_id) {
@@ -118,18 +117,18 @@ module.exports = {
             const dest = path.join(wwwDest, asset.target);
             const destDir = path.parse(dest).dir;
             if (destDir !== '' && !fs.existsSync(destDir)) {
-                shell.mkdir('-p', destDir);
+                fs.mkdirSync(destDir, { recursive: true });
             }
 
             if (fs.statSync(src).isDirectory()) {
-                shell.cp('-Rf', src + '/*', dest);
+                fs.cpSync(src, dest, { recursive: true, force: true });
             } else {
-                shell.cp('-f', src, dest);
+                fs.cpSync(src, dest, { force: true });
             }
         },
         uninstall: function (asset, wwwDest, plugin_id) {
-            shell.rm('-rf', path.join(wwwDest, asset.target));
-            shell.rm('-rf', path.join(wwwDest, 'plugins', plugin_id));
+            fs.rmSync(path.join(wwwDest, asset.target), { recursive: true, force: true });
+            fs.rmSync(path.join(wwwDest, 'plugins', plugin_id), { recursive: true, force: true });
         }
     }
 };

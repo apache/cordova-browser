@@ -18,9 +18,8 @@
 */
 
 const browser_handler = require('../bin/template/cordova/browser_handler');
-const shell = require('shelljs');
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 describe('Asset install tests', function () {
     let fsstatMock;
@@ -43,8 +42,8 @@ describe('Asset install tests', function () {
     const plugin_dir = 'pluginDir';
     const wwwDest = 'dest';
 
-    it('if src is a directory, should be called with cp, -Rf', function () {
-        const cp = spyOn(shell, 'cp').and.returnValue('-Rf');
+    it('if src is a directory, should be called with cpSync recursive force', function () {
+        const cp = spyOn(fs, 'cpSync').and.callFake(() => {});
         fsstatMock = {
             isDirectory: function () {
                 return true;
@@ -52,11 +51,14 @@ describe('Asset install tests', function () {
         };
         spyOn(fs, 'statSync').and.returnValue(fsstatMock);
         browser_handler.asset.install(asset, plugin_dir, wwwDest);
-        expect(cp).toHaveBeenCalledWith('-Rf', jasmine.any(String), path.join('dest', asset.target));
+        expect(cp).toHaveBeenCalledWith(jasmine.any(String), path.join('dest', asset.target), {
+            recursive: true,
+            force: true
+        });
     });
     it('if src is not a directory and asset has no path, should be called with cp, -f', function () {
-        const cp = spyOn(shell, 'cp').and.returnValue('-f');
-        const mkdir = spyOn(shell, 'mkdir');
+        const cp = spyOn(fs, 'cpSync').and.callFake(() => {});
+        const mkdir = spyOn(fs, 'mkdirSync');
         spyOn(fs, 'existsSync').and.returnValue(true);
         fsstatMock = {
             isDirectory: function () {
@@ -66,14 +68,16 @@ describe('Asset install tests', function () {
         spyOn(fs, 'statSync').and.returnValue(fsstatMock);
         browser_handler.asset.install(asset, plugin_dir, wwwDest);
         expect(mkdir).not.toHaveBeenCalled();
-        expect(cp).toHaveBeenCalledWith('-f', path.join('pluginDir', asset.src), path.join('dest', asset.target));
+        expect(cp).toHaveBeenCalledWith(path.join('pluginDir', asset.src), path.join('dest', asset.target), {
+            force: true
+        });
     });
     it('if src is not a directory and asset has a path, should be called with cp, -f', function () {
         /*
             Test that a dest directory gets created if it does not exist
         */
-        const cp = spyOn(shell, 'cp').and.returnValue('-f');
-        const mkdir = spyOn(shell, 'mkdir');
+        const cp = spyOn(fs, 'cpSync').and.callFake(() => {});
+        const mkdir = spyOn(fs, 'mkdirSync');
         fsstatMock = {
             isDirectory: function () {
                 return false;
@@ -82,9 +86,12 @@ describe('Asset install tests', function () {
         spyOn(fs, 'statSync').and.returnValue(fsstatMock);
 
         browser_handler.asset.install(assetWithPath, plugin_dir, wwwDest);
-        expect(mkdir).toHaveBeenCalledWith('-p', path.join('dest', 'js', 'deepdown'));
-        expect(cp).toHaveBeenCalledWith('-f', path.join('pluginDir', assetWithPath.src),
-            path.join('dest', assetWithPath.target));
+        expect(mkdir).toHaveBeenCalledWith(path.join('dest', 'js', 'deepdown'), {
+            recursive: true
+        });
+        expect(cp).toHaveBeenCalledWith(path.join('pluginDir', assetWithPath.src), path.join('dest', assetWithPath.target), {
+            force: true
+        });
         /*
             Now test that a second call to the same dest folder skips mkdir because the first asset call should have created it.
         */

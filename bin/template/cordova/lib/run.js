@@ -19,9 +19,9 @@
     under the License.
 */
 
-const fs = require('fs');
-const path = require('path');
-const url = require('url');
+const fs = require('node:fs');
+const path = require('node:path');
+const url = require('node:url');
 const cordovaServe = require('cordova-serve');
 
 module.exports.run = function (args) {
