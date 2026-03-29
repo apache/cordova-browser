@@ -29,6 +29,7 @@ module.exports.run = function (args) {
     args.port = args.port || 8000;
     args.target = args.target || 'default'; // make default the system browser
     args.noLogOutput = args.silent || false;
+    args.https = args.https || false;
 
     const wwwPath = path.join(__dirname, '../../www');
     const manifestFilePath = path.resolve(path.join(wwwPath, 'manifest.json'));
@@ -53,7 +54,7 @@ module.exports.run = function (args) {
                 startPage = 'index.html';
             }
 
-            const projectUrl = (new url.URL(`http://localhost:${server.port}/${startPage}`)).href;
+            const projectUrl = (new url.URL(` ${(args.https) ? 'https' : 'http'}://localhost:${server.port}/${startPage}`)).href;
 
             console.log('startPage = ' + startPage);
             console.log('Static file server running @ ' + projectUrl + '\nCTRL + C to shut down');
