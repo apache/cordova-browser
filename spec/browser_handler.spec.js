@@ -17,7 +17,7 @@
     under the License.
 */
 
-const browser_handler = require('../bin/template/cordova/browser_handler');
+const browser_handler = require('../lib/browser_handler');
 const fs = require('node:fs');
 const path = require('node:path');
 
