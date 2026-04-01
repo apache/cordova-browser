@@ -17,9 +17,8 @@
     under the License.
 */
 
-const fs = require('fs');
-const path = require('path');
-const shell = require('shelljs');
+const fs = require('node:fs');
+const path = require('node:path');
 const CordovaError = require('cordova-common').CordovaError;
 const events = require('cordova-common').events;
 const FileUpdater = require('cordova-common').FileUpdater;
@@ -78,5 +77,5 @@ browser_parser.prototype.config_xml = function () {
 
 browser_parser.prototype.update_project = async function (cfg) {
     // Copy munged config.xml to platform www dir
-    shell.cp('-rf', this.config_xml(), this.www_dir());
+    fs.cpSync(this.config_xml(), this.www_dir(), { recursive: true, force: true });
 };

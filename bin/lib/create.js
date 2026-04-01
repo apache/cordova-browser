@@ -19,9 +19,8 @@
     under the License.
 */
 
-const fs = require('fs');
-const shell = require('shelljs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const ROOT = path.join(__dirname, '..', '..');
 const events = require('cordova-common').events;
 const check_reqs = require('./check_reqs');
@@ -53,29 +52,37 @@ module.exports.createProject = function (project_path, package_name, project_nam
         events.emit('error', 'Please make sure you meet the software requirements in order to build a browser cordova project');
     }
 
-    // copy template/cordova directory ( recursive )
-    shell.cp('-r', path.join(ROOT, 'bin/template/cordova'), project_path);
+    // copy template/* to project_path directory ( recursive )
+    fs.cpSync(path.join(ROOT, 'bin/template'), project_path, { recursive: true });
 
-    // copy template/www directory ( recursive )
-    shell.cp('-r', path.join(ROOT, 'bin/template/www'), project_path);
-
+    // TODO: stop copying cordova-browser logic into platforms/browser/
     // recreate our node_modules structure in the new project
     const nodeModulesDir = path.join(ROOT, 'node_modules');
-    if (fs.existsSync(nodeModulesDir)) shell.cp('-r', nodeModulesDir, path.join(project_path, 'cordova'));
+    if (fs.existsSync(nodeModulesDir)) {
+        fs.cpSync(nodeModulesDir, path.join(project_path, 'cordova/node_modules'), { recursive: true });
+    }
 
     // copy check_reqs file
-    shell.cp(path.join(ROOT, 'bin/lib/check_reqs.js'),
-        path.join(project_path, 'cordova/lib'));
+    fs.cpSync(
+        path.join(ROOT, 'bin/lib/check_reqs.js'),
+        path.join(project_path, 'cordova/lib/check_reqs.js')
+    );
 
     // create platform_www dir if it does not exist yet
     const platform_www = path.join(project_path, 'platform_www');
-    shell.mkdir('-p', platform_www);
+    fs.mkdirSync(platform_www, { recursive: true });
 
     // copy cordova js file to platform_www
-    shell.cp(path.join(ROOT, 'bin/template/www/cordova.js'), platform_www);
+    fs.cpSync(
+        path.join(ROOT, 'bin/template/www/cordova.js'),
+        path.join(platform_www, 'cordova.js')
+    );
 
     // copy favicon file to platform_www
-    shell.cp(path.join(ROOT, 'bin/template/www/favicon.ico'), platform_www);
+    fs.cpSync(
+        path.join(ROOT, 'bin/template/www/favicon.ico'),
+        path.join(platform_www, 'favicon.ico')
+    );
 
     // load manifest to write name/shortname
     const manifest = require(path.join(ROOT, 'bin/template/www', 'manifest.json'));
