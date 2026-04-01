@@ -72,7 +72,7 @@ function Api (platform, platformRootDir, events) {
     if (!dirExists(this.root) || !dirExists(path.join(this.root, 'cordova'))) {
         throw new CordovaError('The provided path "' + this.root + '" is not a valid browser project.');
     }
-    this._handler = require('../../../lib/browser_handler');
+    this._handler = require('../../lib/browser_handler');
 
     this.locations = {
         platformRootDir,
@@ -84,7 +84,7 @@ function Api (platform, platformRootDir, events) {
         defaultConfigXml: path.join(this.root, 'cordova/defaults.xml'),
         build: path.join(this.root, 'build'),
         // NOTE: Due to platformApi spec we need to return relative paths here
-        cordovaJs: 'bin/templates/project/assets/www/cordova.js',
+        cordovaJs: 'templates/project/assets/www/cordova.js',
         cordovaJsSrc: 'cordova-js-src'
     };
 
@@ -94,7 +94,7 @@ function Api (platform, platformRootDir, events) {
 }
 
 Api.createPlatform = function (dest, config, options, events) {
-    const creator = require('../../../lib/create');
+    const creator = require('../../lib/create');
     events = setupEvents(events);
 
     let name = 'HelloCordova';
@@ -547,22 +547,22 @@ Api.prototype._removeModulesInfo = function (plugin, targetDir) {
 
 Api.prototype.build = function (buildOptions) {
     const self = this;
-    return require('../../../lib/check_reqs').run()
+    return require('../../lib/check_reqs').run()
         .then(function () {
-            return require('../../../lib/build').run.call(self, buildOptions);
+            return require('../../lib/build').run.call(self, buildOptions);
         });
 };
 
 Api.prototype.run = function (runOptions) {
-    return require('../../../lib/run').run(runOptions);
+    return require('../../lib/run').run(runOptions);
 };
 
 Api.prototype.clean = function (cleanOptions) {
-    return require('../../../lib/clean').run(cleanOptions);
+    return require('../../lib/clean').run(cleanOptions);
 };
 
 Api.prototype.requirements = function () {
-    return require('../../../lib/check_reqs').run();
+    return require('../../lib/check_reqs').run();
 };
 
 module.exports = Api;

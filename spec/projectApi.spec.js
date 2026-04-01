@@ -20,7 +20,7 @@
 const path = require('node:path');
 const EventEmitter = require('node:events');
 
-const Api = require('../bin/template/cordova/Api');
+const Api = require('../templates/cordova/Api');
 const create = require('../lib/create');
 
 describe('can get the Api', function () {
@@ -41,7 +41,7 @@ describe('can get the Api', function () {
     describe('static createPlatform method', () => {
         it('should create a platform app and return the Api', () => {
             // Trick function under test to load our Api after calling createProject
-            const testDir = path.join(__dirname, '../bin/template');
+            const testDir = path.join(__dirname, '../templates');
             const testOpts = {};
             spyOn(create, 'createProject').and.returnValue(Promise.resolve());
 
