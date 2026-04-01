@@ -547,22 +547,22 @@ Api.prototype._removeModulesInfo = function (plugin, targetDir) {
 
 Api.prototype.build = function (buildOptions) {
     const self = this;
-    return require('./lib/check_reqs').run()
+    return require('../../../lib/check_reqs').run()
         .then(function () {
-            return require('./lib/build').run.call(self, buildOptions);
+            return require('../../../lib/build').run.call(self, buildOptions);
         });
 };
 
 Api.prototype.run = function (runOptions) {
-    return require('./lib/run').run(runOptions);
+    return require('../../../lib/run').run(runOptions);
 };
 
 Api.prototype.clean = function (cleanOptions) {
-    return require('./lib/clean').run(cleanOptions);
+    return require('../../../lib/clean').run(cleanOptions);
 };
 
 Api.prototype.requirements = function () {
-    return require('./lib/check_reqs').run();
+    return require('../../../lib/check_reqs').run();
 };
 
 module.exports = Api;
