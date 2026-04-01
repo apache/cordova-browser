@@ -94,7 +94,7 @@ function Api (platform, platformRootDir, events) {
 }
 
 Api.createPlatform = function (dest, config, options, events) {
-    const creator = require('../../lib/create');
+    const creator = require('../../../lib/create');
     events = setupEvents(events);
 
     let name = 'HelloCordova';

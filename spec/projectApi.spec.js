@@ -21,7 +21,7 @@ const path = require('node:path');
 const EventEmitter = require('node:events');
 
 const Api = require('../bin/template/cordova/Api');
-const create = require('../bin/lib/create');
+const create = require('../lib/create');
 
 describe('can get the Api', function () {
     it('should be defined', function () {
