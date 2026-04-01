@@ -17,11 +17,24 @@
     under the License.
 */
 
-const path = require('node:path');
-const EventEmitter = require('node:events');
 
-const Api = require('../templates/cordova/Api');
-const create = require('../lib/create');
+const path = require('node:path');
+const { Module } = require('node:module');
+const EventEmitter = require('node:events');
+const tmp = require('tmp');
+
+process.env.NODE_PATH = path.resolve(__dirname, '../../');
+Module._initPaths();
+
+const { ConfigParser } = require('cordova-common');
+const Api = require('../lib/Api');
+
+tmp.setGracefulCleanup();
+
+function makeTempDir () {
+    const tempdir = tmp.dirSync({ unsafeCleanup: true });
+    return path.join(tempdir.name, `cordova-browser-create-test-${Date.now()}`);
+}
 
 describe('can get the Api', function () {
     it('should be defined', function () {
@@ -40,23 +53,37 @@ describe('can get the Api', function () {
 
     describe('static createPlatform method', () => {
         it('should create a platform app and return the Api', () => {
-            // Trick function under test to load our Api after calling createProject
-            const testDir = path.join(__dirname, '../templates');
-            const testOpts = {};
-            spyOn(create, 'createProject').and.returnValue(Promise.resolve());
+            // Trick function under test to load our Api after callin
+            const testDir = makeTempDir();
 
-            return Api.createPlatform(testDir, null, testOpts, new EventEmitter()).then(api => {
-                expect(api).toBeInstanceOf(Api);
-                expect(create.createProject).toHaveBeenCalledWith(
-                    testDir, jasmine.any(String), jasmine.any(String), testOpts
-                );
-            });
+            const testOpts = {};
+            const configXmlPath = path.join(__dirname, 'fixtures/default-config.xml');
+            const config = new ConfigParser(configXmlPath);
+
+            return Api.createPlatform(testDir, config, testOpts, new EventEmitter())
+                .then(api => {
+                    expect(api).toBeInstanceOf(Api);
+                });
         });
     });
 });
 
 describe('project level Api', function () {
-    const testApi = new Api();
+    let testApi = null;
+
+    beforeAll(() => {
+        const testDir = makeTempDir();
+
+        const testOpts = {};
+        const configXmlPath = path.join(__dirname, 'fixtures/default-config.xml');
+        const config = new ConfigParser(configXmlPath);
+
+        return Api.createPlatform(testDir, config, testOpts, new EventEmitter())
+            .then(api => {
+                testApi = api;
+            });
+
+    });
 
     it('can be created', function () {
         expect(testApi).toBeDefined();
@@ -102,15 +129,3 @@ describe('project level Api', function () {
         expect(typeof testApi.getPlatformInfo).toBe('function');
     });
 });
-
-// Static methods
-// Static method: createPlatform
-// returns promise fulfilled with Api
-// emits error using provided emmitter on error
-
-// Static method: updatePlatform
-// returns a promise fulfilled with an Api
-// emits error using provided emmitter on error
-
-// Instance methods
-// requirements, clean, run, build, removePlugin, addPlugin, prepare, getPlatformInfo

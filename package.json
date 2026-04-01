@@ -2,7 +2,7 @@
   "name": "cordova-browser",
   "version": "8.0.0-dev",
   "description": "cordova-browser release",
-  "main": "templates/cordova/Api.js",
+  "main": "lib/Api.js",
   "repository": "github:apache/cordova-browser",
   "bugs": "https://github.com/apache/cordova-browser/issues",
   "keywords": [
