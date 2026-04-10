@@ -21,12 +21,11 @@ const path = require('node:path');
 const { Module } = require('node:module');
 const EventEmitter = require('node:events');
 const tmp = require('tmp');
+const { ConfigParser } = require('cordova-common');
+const Api = require('../lib/Api');
 
 process.env.NODE_PATH = path.resolve(__dirname, '../../');
 Module._initPaths();
-
-const { ConfigParser } = require('cordova-common');
-const Api = require('../lib/Api');
 
 tmp.setGracefulCleanup();
 
