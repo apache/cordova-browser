@@ -20,7 +20,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const tmp = require('tmp');
-const create = require('../bin/lib/create');
+const create = require('../lib/create');
 
 tmp.setGracefulCleanup();
 

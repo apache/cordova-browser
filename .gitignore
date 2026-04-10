@@ -34,4 +34,4 @@ temp
 *.tgz
 
 # Other
-bin/template/www/cordova.js
+templates/www/cordova.js
