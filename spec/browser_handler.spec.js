@@ -44,6 +44,8 @@ describe('Asset install tests', function () {
 
     it('if src is a directory, should be called with cpSync recursive force', function () {
         const cp = spyOn(fs, 'cpSync').and.callFake(() => {});
+        const mkdirSync = spyOn(fs, 'mkdirSync').and.callFake(() => {});
+
         fsstatMock = {
             isDirectory: function () {
                 return true;
@@ -51,6 +53,9 @@ describe('Asset install tests', function () {
         };
         spyOn(fs, 'statSync').and.returnValue(fsstatMock);
         browser_handler.asset.install(asset, plugin_dir, wwwDest);
+        expect(mkdirSync).toHaveBeenCalledWith(wwwDest, {
+            recursive: true
+        });
         expect(cp).toHaveBeenCalledWith(jasmine.any(String), path.join('dest', asset.target), {
             recursive: true,
             force: true
