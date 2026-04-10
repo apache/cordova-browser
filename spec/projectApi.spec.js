@@ -17,7 +17,6 @@
     under the License.
 */
 
-
 const path = require('node:path');
 const { Module } = require('node:module');
 const EventEmitter = require('node:events');
@@ -82,7 +81,6 @@ describe('project level Api', function () {
             .then(api => {
                 testApi = api;
             });
-
     });
 
     it('can be created', function () {
