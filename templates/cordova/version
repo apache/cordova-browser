@@ -19,7 +19,6 @@
     under the License.
 */
 
-// Coho updates this line:
-const VERSION = '8.0.0-dev';
+const Api = require('./Api');
 
-console.log(VERSION);
+console.log(Api.version());
