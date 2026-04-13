@@ -2,7 +2,7 @@
   "name": "cordova-browser",
   "version": "8.0.0-dev",
   "description": "cordova-browser release",
-  "main": "bin/template/cordova/Api.js",
+  "main": "lib/Api.js",
   "repository": "github:apache/cordova-browser",
   "bugs": "https://github.com/apache/cordova-browser/issues",
   "keywords": [
@@ -11,7 +11,7 @@
     "apache"
   ],
   "scripts": {
-    "prepare": "cordova-js build > bin/template/www/cordova.js",
+    "prepare": "cordova-js build > templates/www/cordova.js",
     "cover": "c8 jasmine",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
@@ -36,8 +36,8 @@
   },
   "c8": {
     "include": [
-      "bin/lib/**",
-      "bin/templates/cordova/**"
+      "lib/**",
+      "templates/cordova/**"
     ],
     "reporter": [
       "lcov",

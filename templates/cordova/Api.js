@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
@@ -19,7 +17,4 @@
     under the License.
 */
 
-// Coho updates this line:
-const VERSION = '8.0.0-dev';
-
-console.log(VERSION);
+module.exports = require('cordova-browser');

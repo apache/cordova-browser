@@ -25,12 +25,12 @@ const browserConfig = require('@cordova/eslint-config/browser');
 module.exports = defineConfig([
     globalIgnores([
         '**/coverage/',
-        'bin/template/www/cordova.js'
+        'templates/www/cordova.js'
     ]),
     ...nodeConfig.map(config => ({
         files: [
             '**/*.js',
-            'bin/template/cordova/version'
+            'templates/cordova/version'
         ],
         ...config
     })),
@@ -41,7 +41,7 @@ module.exports = defineConfig([
     ...browserConfig.map(config => ({
         files: [
             'cordova-js-src/**/*.js',
-            'bin/template/www/**/*.js'
+            'templates/www/**/*.js'
         ],
         ...config,
         languageOptions: {
