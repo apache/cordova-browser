@@ -17,9 +17,10 @@
     under the License.
 */
 
-const browser_handler = require('../lib/browser_handler');
 const fs = require('node:fs');
 const path = require('node:path');
+
+const browser_handler = require('../lib/browser_handler');
 
 describe('Asset install tests', function () {
     let fsstatMock;
