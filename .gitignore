@@ -29,6 +29,7 @@ node_modules/
 coverage/
 .nyc_output/
 temp
+lcov.info
 
 # Output of 'npm pack'
 *.tgz

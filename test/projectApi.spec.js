@@ -17,6 +17,8 @@
     under the License.
 */
 
+const { describe, it, before } = require('node:test');
+const assert = require('node:assert');
 const path = require('node:path');
 const { Module } = require('node:module');
 const EventEmitter = require('node:events');
@@ -34,19 +36,19 @@ function makeTempDir () {
     return path.join(tempdir.name, `cordova-browser-create-test-${Date.now()}`);
 }
 
-describe('can get the Api', function () {
-    it('should be defined', function () {
-        expect(Api).toBeDefined();
+describe('can get the Api', () => {
+    it('should be defined', () => {
+        assert.notStrictEqual(Api, undefined);
     });
 
-    it('should export static createPlatform function', function () {
-        expect(Api.createPlatform).toBeDefined();
-        expect(typeof Api.createPlatform).toBe('function');
+    it('should export static createPlatform function', () => {
+        assert.notStrictEqual(Api.createPlatform, undefined);
+        assert.strictEqual(typeof Api.createPlatform, 'function');
     });
 
-    it('should export static updatePlatform function', function () {
-        expect(Api.updatePlatform).toBeDefined();
-        expect(typeof Api.updatePlatform).toBe('function');
+    it('should export static updatePlatform function', () => {
+        assert.notStrictEqual(Api.updatePlatform, undefined);
+        assert.strictEqual(typeof Api.updatePlatform, 'function');
     });
 
     describe('static createPlatform method', () => {
@@ -60,16 +62,16 @@ describe('can get the Api', function () {
 
             return Api.createPlatform(testDir, config, testOpts, new EventEmitter())
                 .then(api => {
-                    expect(api).toBeInstanceOf(Api);
+                    assert.ok(api instanceof Api);
                 });
         });
     });
 });
 
-describe('project level Api', function () {
+describe('project level Api', () => {
     let testApi = null;
 
-    beforeAll(() => {
+    before(() => {
         const testDir = makeTempDir();
 
         const testOpts = {};
@@ -82,47 +84,47 @@ describe('project level Api', function () {
             });
     });
 
-    it('can be created', function () {
-        expect(testApi).toBeDefined();
+    it('can be created', () => {
+        assert.notStrictEqual(testApi, undefined);
     });
 
-    it('has a requirements method', function () {
-        expect(testApi.requirements).toBeDefined();
-        expect(typeof testApi.requirements).toBe('function');
+    it('has a requirements method', () => {
+        assert.notStrictEqual(testApi.requirements, undefined);
+        assert.strictEqual(typeof testApi.requirements, 'function');
     });
 
-    it('has a clean method', function () {
-        expect(testApi.clean).toBeDefined();
-        expect(typeof testApi.clean).toBe('function');
+    it('has a clean method', () => {
+        assert.notStrictEqual(testApi.clean, undefined);
+        assert.strictEqual(typeof testApi.clean, 'function');
     });
 
-    it('has a run method', function () {
-        expect(testApi.run).toBeDefined();
-        expect(typeof testApi.run).toBe('function');
+    it('has a run method', () => {
+        assert.notStrictEqual(testApi.run, undefined);
+        assert.strictEqual(typeof testApi.run, 'function');
     });
 
-    it('has a build method', function () {
-        expect(testApi.build).toBeDefined();
-        expect(typeof testApi.build).toBe('function');
+    it('has a build method', () => {
+        assert.notStrictEqual(testApi.build, undefined);
+        assert.strictEqual(typeof testApi.build, 'function');
     });
 
-    it('has a removePlugin method', function () {
-        expect(testApi.removePlugin).toBeDefined();
-        expect(typeof testApi.removePlugin).toBe('function');
+    it('has a removePlugin method', () => {
+        assert.notStrictEqual(testApi.removePlugin, undefined);
+        assert.strictEqual(typeof testApi.removePlugin, 'function');
     });
 
-    it('has a addPlugin method', function () {
-        expect(testApi.addPlugin).toBeDefined();
-        expect(typeof testApi.addPlugin).toBe('function');
+    it('has a addPlugin method', () => {
+        assert.notStrictEqual(testApi.addPlugin, undefined);
+        assert.strictEqual(typeof testApi.addPlugin, 'function');
     });
 
-    it('has a prepare method', function () {
-        expect(testApi.prepare).toBeDefined();
-        expect(typeof testApi.prepare).toBe('function');
+    it('has a prepare method', () => {
+        assert.notStrictEqual(testApi.prepare, undefined);
+        assert.strictEqual(typeof testApi.prepare, 'function');
     });
 
-    it('has a getPlatformInfo method', function () {
-        expect(testApi.getPlatformInfo).toBeDefined();
-        expect(typeof testApi.getPlatformInfo).toBe('function');
+    it('has a getPlatformInfo method', () => {
+        assert.notStrictEqual(testApi.getPlatformInfo, undefined);
+        assert.strictEqual(typeof testApi.getPlatformInfo, 'function');
     });
 });
