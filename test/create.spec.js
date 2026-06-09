@@ -17,6 +17,8 @@
     under the License.
 */
 
+const { describe, it, beforeEach, afterEach } = require('node:test');
+const assert = require('node:assert');
 const fs = require('node:fs');
 const path = require('node:path');
 const tmp = require('tmp');
@@ -37,8 +39,8 @@ function makeTempDir () {
  * @param {String} projectName
  */
 function verifyProjectFiles (tmpDir, projectName) {
-    expect(fs.existsSync(path.join(tmpDir, 'www'))).toBe(true);
-    expect(fs.existsSync(path.join(tmpDir, 'platform_www'))).toBe(true);
+    assert.ok(fs.existsSync(path.join(tmpDir, 'www')));
+    assert.ok(fs.existsSync(path.join(tmpDir, 'platform_www')));
 }
 
 /**
@@ -56,28 +58,28 @@ async function verifyCreatedProject (tmpDir, packageName, projectName) {
 
 function verifyManifestFiles (tmpDir, projectName) {
     const manifestPath = path.join(tmpDir, 'platform_www/manifest.json');
-    expect(fs.existsSync(manifestPath)).toBe(true);
+    assert.ok(fs.existsSync(manifestPath));
     const manifestObj = require(manifestPath);
-    expect(manifestObj.name).toBe(projectName);
+    assert.strictEqual(manifestObj.name, projectName);
     // start_url
-    expect(manifestObj.start_url).toBe('index.html');
+    assert.strictEqual(manifestObj.start_url, 'index.html');
     // display
-    expect(manifestObj.display).toBe('standalone');
+    assert.strictEqual(manifestObj.display, 'standalone');
     // description
-    expect(manifestObj.description).toBeDefined();
+    assert.notStrictEqual(manifestObj.description, undefined);
     // background_color
-    expect(manifestObj.background_color).toBeDefined();
+    assert.notStrictEqual(manifestObj.background_color, undefined);
     // theme_color
-    expect(manifestObj.theme_color).toBeDefined();
+    assert.notStrictEqual(manifestObj.theme_color, undefined);
     // scope
-    expect(manifestObj.scope).toBeDefined();
+    assert.notStrictEqual(manifestObj.scope, undefined);
     // orientation
-    expect(manifestObj.orientation).toBeDefined();
+    assert.notStrictEqual(manifestObj.orientation, undefined);
     // icons
-    expect(manifestObj.icons).toBeDefined();
-    expect(Array.isArray(manifestObj.icons)).toBe(true);
-    expect(manifestObj.icons.length).toBeDefined();
-    expect(manifestObj.icons.length).toBeGreaterThan(0);
+    assert.notStrictEqual(manifestObj.icons, undefined);
+    assert.ok(Array.isArray(manifestObj.icons));
+    assert.notStrictEqual(manifestObj.icons.length, undefined);
+    assert.ok(manifestObj.icons.length > 0);
 }
 
 describe('create', () => {
@@ -91,43 +93,43 @@ describe('create', () => {
         fs.rmSync(tmpDir, { recursive: true, force: true });
     });
 
-    it('create project with ascii name, no spaces', function () {
+    it('create project with ascii name, no spaces', () => {
         const projectName = 'testcreate';
         const packageName = 'com.test.app1';
         return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
-    it('create project with ascii name, and spaces', function () {
+    it('create project with ascii name, and spaces', () => {
         const projectName = 'test create';
         const packageName = 'com.test.app2';
         return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
-    it('create project with unicode name, no spaces', function () {
+    it('create project with unicode name, no spaces', () => {
         const projectName = '応応応応用用用用';
         const packageName = 'com.test.app3';
         return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
-    it('create project with unicode name, and spaces', function () {
+    it('create project with unicode name, and spaces', () => {
         const projectName = '応応応応 用用用用';
         const packageName = 'com.test.app4';
         return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
-    it('create project with ascii+unicode name, no spaces', function () {
+    it('create project with ascii+unicode name, no spaces', () => {
         const projectName = '応応応応hello用用用用';
         const packageName = 'com.test.app5';
         return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
-    it('create project with ascii+unicode name, and spaces', function () {
+    it('create project with ascii+unicode name, and spaces', () => {
         const projectName = '応応応応 hello 用用用用';
         const packageName = 'com.test.app6';
         return verifyCreatedProject(tmpDir, packageName, projectName);
     });
 
-    it('should have manifest.json', function () {
+    it('should have manifest.json', () => {
         const projectName = 'testcreate';
         const packageName = 'com.test.app1';
         return verifyCreatedProject(tmpDir, packageName, projectName)
