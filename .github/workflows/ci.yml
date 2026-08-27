@@ -25,15 +25,45 @@ on:
     branches:
       - '*'
 
-permissions:
-  contents: read
-  security-events: write
-
 jobs:
+  codeql:
+    name: CodeQL Analysis
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      # "templates/www/cordova.js" is ignored because it is a generated file.
+      # It contains mixed content from the npm package "cordova-js" and "./cordova-js-src".
+      # The report might not be resolvable because of the external package.
+      # If the report is related to this repository, it would be detected when scanning "./cordova-js-src".
+      - uses: github/codeql-action/init@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
+        with:
+          languages: javascript
+          queries: security-and-quality
+          config: |
+            paths-ignore:
+              - coverage
+              - node_modules
+              - templates/www/cordova.js
+
+      - uses: github/codeql-action/analyze@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
+
   test:
     name: NodeJS ${{ matrix.node-version }} on ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
+
+    permissions:
+      contents: read
 
     strategy:
       matrix:
@@ -55,27 +85,11 @@ jobs:
           node --version
           npm --version
 
-      # "templates/www/cordova.js" is ignored because it is a generated file.
-      # It contains mixed content from the npm package "cordova-js" and "./cordova-js-src".
-      # The report might not be resolvable because of the external package.
-      # If the report is related to this repository, it would be detected when scanning "./cordova-js-src".
-      - uses: github/codeql-action/init@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
-        with:
-          languages: javascript
-          queries: security-and-quality
-          config: |
-            paths-ignore:
-              - coverage
-              - node_modules
-              - templates/www/cordova.js
-
       - name: npm install and test
         run: |
           npm cit
         env:
           CI: true
-
-      - uses: github/codeql-action/analyze@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4.37.8
 
       - uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         if: success()
