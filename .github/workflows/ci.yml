@@ -45,7 +45,7 @@ jobs:
       # It contains mixed content from the npm package "cordova-js" and "./cordova-js-src".
       # The report might not be resolvable because of the external package.
       # If the report is related to this repository, it would be detected when scanning "./cordova-js-src".
-      - uses: github/codeql-action/init@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+      - uses: github/codeql-action/init@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
         with:
           languages: javascript
           queries: security-and-quality
@@ -55,7 +55,7 @@ jobs:
               - node_modules
               - templates/www/cordova.js
 
-      - uses: github/codeql-action/analyze@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
+      - uses: github/codeql-action/analyze@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4.39.0
 
   test:
     name: NodeJS ${{ matrix.node-version }} on ${{ matrix.os }}
